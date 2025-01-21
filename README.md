@@ -9,9 +9,6 @@ Welcome to the inkspire Blogging Platform repository! inkspire is a full-stack b
 - [Technologies Used](#technologies-used)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
-
 ## Demo
 
 Check out the live demo of the inkspire platform [here](https://inkspire.mohammedsh.xyz).
@@ -122,11 +119,3 @@ Now you're ready to explore and interact with the Inkspire platform locally on y
 - Receive notifications about likes, comments, and replies on your blog posts, as well as other relevant activity.
 - Report inappropriate content or spam.
 - Admins can manage users, blog posts, and reported content from the admin panel.
-
-## Contributing
-
-Contributions are welcome! If you find any bugs or have suggestions for improvement, please open an issue or submit a pull request.
-
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](https://github.com/mhdZhHan/mern-blogging-website/blob/main/LICENSE) file for details.
