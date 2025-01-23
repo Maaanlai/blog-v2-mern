@@ -80,6 +80,20 @@ const BlogContent = ({ block }) => {
     if (type == "list") {
         return <List style={data.style} items={data.items} />
     }
+
+    if (type == "linkTool") {
+        const videoId = getVideoId(data.link)
+        console.log(videoId)
+        return <iframe className="w-full" src={`https://www.youtube.com/embed/${videoId}`} 
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+        allowFullScreen />
+    }
 }
+
+function getVideoId(url) {
+    const urlParams = new URL(url).searchParams;
+    return urlParams.get('v');
+}
+
 
 export default BlogContent

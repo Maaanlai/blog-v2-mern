@@ -36,4 +36,6 @@ router.post("/is-user-liked", verifyJWT, isUserLiked)
 
 router.post("/delete", verifyJWT, deleteBlog)
 
+// router.post("/fetchUrl", verifyJWT, fetchUrl)
+
 export default router

@@ -9,15 +9,4 @@ const s3 = new S3Client({
     },
 });
 
-// async function generateSignedUrl(fileName) {
-//     const command = new GetObjectCommand({
-//         Bucket: "testing-ap-tokyo",
-//         Key: fileName,
-//     });
-
-//     return await getSignedUrl(s3Client, command, { expiresIn: 3600 });
-// }
-
-// export { s3, generateSignedUrl };
-
 export { s3 };

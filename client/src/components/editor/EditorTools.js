@@ -5,6 +5,7 @@ import Header from "@editorjs/header"
 import Quote from "@editorjs/quote"
 import Marker from "@editorjs/marker"
 import InlineCode from "@editorjs/inline-code"
+import LinkTool from '@editorjs/link';
 
 // functions
 import { uploadImage } from "../../functions/aws"
@@ -69,4 +70,10 @@ export const tools = {
     },
     marker: Marker,
     inlineCode: InlineCode,
+    linkTool: {
+        class: LinkTool,
+        config: {
+          endpoint: '',
+        }
+      }
 }

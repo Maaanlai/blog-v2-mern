@@ -28,7 +28,7 @@ const generateUploadUrl = async () => {
 	const imageName = `${nanoid()}-${date.getTime()}.jpeg`;
 
 	const uploadParams = {
-		Bucket: "testing-ap-tokyo",
+		Bucket: "ubcompliance-tokyo1",
 		Key: imageName,
 		ContentType: "image/jpeg",
 	  };
