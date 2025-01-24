@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom"
-import { getDate } from "../../../utils/getDate"
+import { Link } from "react-router-dom";
+import { getDate } from "../../../utils/getDate";
 
 const BlogCard = ({ blog, author }) => {
     const {
@@ -10,51 +10,70 @@ const BlogCard = ({ blog, author }) => {
         publishedAt,
         activity: { total_likes },
         blog_id: id,
-    } = blog
+    } = blog;
 
-    const { fullName, username, profile_img } = author
+    const { fullName, username, profile_img } = author;
 
     return (
         <Link
             to={`/blog/${id}`}
-            className="flex gap-8 items-center border-b border-grey pb-4 mb-4"
+            className="block bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300 overflow-hidden"
         >
-            <div className="w-full">
-                <div className="flex gap-2 items-center mb-7">
-                    <img
-                        className="w-6 h-6 rounded-full"
-                        src={profile_img}
-                        alt={fullName}
-                    />
-                    <p className="line-clamp-1">
-                        {fullName} @{username}
-                    </p>
-                    <p className="min-w-fit">{getDate(publishedAt)}</p>
-                </div>
+            {/* Banner Image */}
+            <div className="relative h-48 w-full overflow-hidden">
+                <img
+                    src={banner}
+                    alt={title}
+                    className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300"
+                />
+                {/* Tag Overlay */}
+                <span className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-gray-800 px-3 py-1 rounded-full text-sm font-medium">
+                    {tags[0]}
+                </span>
+            </div>
 
-                <h1 className="blog-title">{title}</h1>
-                <p className="my-3 text-xl font-gelasio leading-7 max-sm:hidden md:max-[1100px]:hidden line-clamp-2">
+            <div className="p-6">
+                {/* Title */}
+                <h2 className="text-xl font-bold text-gray-900 line-clamp-2 hover:text-blue-600 transition-colors">
+                    {title}
+                </h2>
+
+                {/* Description */}
+                <p className="mt-3 text-gray-600 line-clamp-2 text-base">
                     {des}
                 </p>
 
-                <div className="flex gap-4 mt-7">
-                    <span className="btn-light py-1 px-4">{tags[0]}</span>
-                    <span className="ml-3 flex items-center gap-2 text-dark-grey">
-                        <i className="fi fi-rr-heart text-xl"></i>
-                        {total_likes}
-                    </span>
+                {/* Author Info & Metadata */}
+                <div className="mt-6 flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                        <img
+                            src={profile_img}
+                            alt={fullName}
+                            className="w-10 h-10 rounded-full border-2 border-white shadow-sm"
+                        />
+                        <div>
+                            <p className="text-sm font-medium text-gray-900">
+                                {fullName}
+                            </p>
+                            <p className="text-sm text-gray-500">
+                                @{username}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="flex items-center space-x-4 text-sm text-gray-500">
+                        <div className="flex items-center">
+                            <i className="fi fi-rr-heart text-red-500 mr-1"></i>
+                            <span>{total_likes}</span>
+                        </div>
+                        <div className="hidden md:block">
+                            <time dateTime={publishedAt}>{getDate(publishedAt)}</time>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            <div className="h-28 aspect-square bg-grey">
-                <img
-                    className="w-full h-full aspect-square object-cover"
-                    src={banner}
-                    alt={title}
-                />
-            </div>
         </Link>
-    )
-}
+    );
+};
 
-export default BlogCard
+export default BlogCard;
