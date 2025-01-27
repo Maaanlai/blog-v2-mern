@@ -162,10 +162,10 @@ const Home = () => {
                     </div>
 
                     {/* Sidebar */}
-                    <div className="lg:w-[350px] shrink-0">
+                    {/* <div className="lg:w-[350px] shrink-0">
                         <div className="sticky top-8 space-y-8">
                             {/* Trending Section */}
-                            <div className="bg-white rounded-xl shadow-sm p-6">
+                            {/* <div className="bg-white rounded-xl shadow-sm p-6">
                                 <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
                                     Trending <i className="fi fi-rr-arrow-trend-up"></i>
                                 </h2>
@@ -193,8 +193,8 @@ const Home = () => {
                                     <NodataMessage message="No trending blogs" />
                                 )}
                             </div>
-                        </div>
-                    </div>
+                        </div> */}
+                    {/* </div> */} 
                 </div>
             </section>
         </AnimationWrapper>

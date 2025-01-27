@@ -3,7 +3,7 @@ import axios from "axios"
 import { Toaster, toast } from "react-hot-toast"
 
 import { useStateContext } from "../contexts/GlobalContext"
-import { authWithGoogle } from "../configs/firebase"
+// import { authWithGoogle } from "../configs/firebase"
 
 //utils
 import { EMAIL_REGEX, PASSWORD_REGEX } from "../utils"
@@ -66,22 +66,22 @@ const AuthForm = ({ type }) => {
         userAuthThroughApi(apiRoute, formData)
     }
 
-    const handleGoogleAuth = (event) => {
-        event.preventDefault()
+    // const handleGoogleAuth = (event) => {
+    //     event.preventDefault()
 
-        authWithGoogle()
-            .then((user) => {
-                const formData = {
-                    access_token: user?.accessToken,
-                }
+    //     authWithGoogle()
+    //         .then((user) => {
+    //             const formData = {
+    //                 access_token: user?.accessToken,
+    //             }
 
-                userAuthThroughApi("/google-auth", formData)
-            })
-            .catch((error) => {
-                toast.error("trouble login through google")
-                console.log(error)
-            })
-    }
+    //             userAuthThroughApi("/google-auth", formData)
+    //         })
+    //         .catch((error) => {
+    //             toast.error("trouble login through google")
+    //             console.log(error)
+    //         })
+    // }
 
     return userData?.access_token ? (
         <Navigate to="/" />
@@ -138,13 +138,13 @@ const AuthForm = ({ type }) => {
                         <hr className="w-1/2 border-black" />
                     </div>
 
-                    <button
+                    {/* <button
                         className="btn-dark flex items-center justify-center gap-4 w-[90%] center"
                         onClick={handleGoogleAuth}
                     >
                         <img src={googleIcon} alt="google" className="w-5" />
                         continue with google
-                    </button>
+                    </button> */}
 
                     {type == "sign-in" ? (
                         <p className="mt-6 text-dark-grey text-xl text-center">

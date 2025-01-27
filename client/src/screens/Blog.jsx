@@ -131,42 +131,45 @@ const Blog = () => {
                     <ReportContainer />
 
                     <div className="max-w-[900px] center py-10 max-lg:px-[5vw]">
-                        <img
-                            src={banner}
-                            alt={title}
-                            className="aspect-square"
-                        />
-
-                        <div className="mt-12">
-                            <h2>{title}</h2>
-
-                            <div className="flex max-sm:flex-col justify-between my-8">
-                                <div className="flex gap-5 items-start">
-                                    <img
-                                        src={profile_img}
-                                        alt={username_}
-                                        className="w-12 h-12 rounded-full"
-                                    />
-
-                                    <p className="capitalize">
-                                        {fullName}
-                                        <br />@
-                                        <Link
-                                            to={`/user/${username_}`}
-                                            className="underline"
-                                        >
-                                            {username_}
-                                        </Link>
-                                    </p>
-                                </div>
-
-                                <p className="text-dark-grey opacity-75 max-sm:mt-6 max-sm:ml-12 max-sm:pl-5">
-                                    Published on {getDate(publishedAt)}
-                                </p>
-                            </div>
-                        </div>
-
-                        <BlogInteraction />
+                    <div className="bg-cover bg-center text-center overflow-hidden h-96">
+        <img src={banner} alt={title} className="w-full h-full object-cover" />
+      </div>
+      
+      {/* Content Section */}
+      <div className="max-w-3xl mx-auto">
+        <div className="mt-3 bg-white rounded-b lg:rounded-b-none lg:rounded-r flex flex-col justify-between leading-normal">
+          <div className="bg-white relative -mt-32 p-5 sm:p-10">
+            {/* Title */}
+            <h1 className="text-gray-900 font-bold text-3xl mb-2">
+              {title}
+            </h1>
+            
+            {/* Author Info */}
+            <div className="flex items-center gap-4 mt-4">
+              <img 
+                src={profile_img} 
+                alt={username_} 
+                className="w-12 h-12 rounded-full"
+              />
+              <div className="flex flex-col">
+                <span className="text-gray-900 font-medium">
+                  {fullName}
+                </span>
+                <Link 
+                  to={`/user/${username_}`}
+                  className="text-indigo-600 hover:text-gray-900 transition duration-500 ease-in-out"
+                >
+                  @{username_}
+                </Link>
+              </div>
+              <span className="text-gray-500 ml-auto">
+                Published on {getDate(publishedAt)}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+                        {/* <BlogInteraction /> */}
 
                         <div className="my-12 font-gelasio blog-page-content">
                             {content[0].blocks.map((block, index) => (
