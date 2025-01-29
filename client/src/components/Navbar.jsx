@@ -101,7 +101,7 @@ const Navbar = () => {
             Бүтээгдэхүүн үйлчилгээ
           </Link>
           <Link
-            to="/lessons"
+            to="/course"
             className="text-dark-grey hover:text-black dark:hover:text-white transition-colors"
           >
             Сургалт материал

@@ -16,6 +16,8 @@ import usersRouter from "./api/v1/routes/users.js"
 import commentsRouter from "./api/v1/routes/comments.js"
 import notificationRouter from "./api/v1/routes/notification.js"
 import adminRouter from "./api/v1/routes/admin.js"
+import courseRouter from "./api/v1/routes/course.js"
+
 
 const __dirname = path.resolve()
 
@@ -40,6 +42,8 @@ app.use("/api/v1/users/", usersRouter)
 app.use("/api/v1/comments/", commentsRouter)
 app.use("/api/v1/notifications/", notificationRouter)
 app.use("/api/v1/admin/", adminRouter)
+app.use("/api/v1/course/", courseRouter)
+
 
 if (process.env.NODE_ENV === "production") {
 	app.use(express.static(path.join(__dirname, "/client/dist")))
