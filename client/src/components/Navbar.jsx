@@ -1,93 +1,126 @@
-import { Fragment, useEffect, useState } from "react"
-import { Link, Outlet, useNavigate } from "react-router-dom"
-import axios from "axios"
+import { Fragment, useEffect, useState } from "react";
+import { Link, Outlet, useNavigate } from "react-router-dom";
+import axios from "axios";
 
-import { useStateContext } from "../contexts/GlobalContext"
+import { useStateContext } from "../contexts/GlobalContext";
 
 // functions
-import { setSession } from "../functions/session"
+import { setSession } from "../functions/session";
 
 // assets
-import { logoDark, logoLight } from "../assets"
+import { logoDark, logoLight } from "../assets";
 
-import UserNavigationPanel from "./UserNavigationPanel"
+import UserNavigationPanel from "./UserNavigationPanel";
 
 const Navbar = () => {
-	const [searchboxVisibility, setSearchBoxVisibility] = useState(false)
-	const [userNavPanel, setUserNavPanel] = useState(false)
+  const [searchboxVisibility, setSearchBoxVisibility] = useState(false);
+  const [userNavPanel, setUserNavPanel] = useState(false);
 
-	const navigate = useNavigate()
+  const navigate = useNavigate();
 
-	const {
-		userData,
-		userData: { access_token, profile_img, new_notification_available },
-		updateUserData,
-		// theme
-		theme,
-		setTheme,
-	} = useStateContext()
+  const {
+    userData,
+    userData: { access_token, profile_img, new_notification_available },
+    updateUserData,
+    // theme
+    theme,
+    setTheme,
+  } = useStateContext();
 
-	const changeTheme = () => {
-		let newTheme = theme == "light" ? "dark" : "light"
+  const changeTheme = () => {
+    let newTheme = theme == "light" ? "dark" : "light";
 
-		setTheme(newTheme)
+    setTheme(newTheme);
 
-		document.body.setAttribute("data-theme", newTheme)
+    document.body.setAttribute("data-theme", newTheme);
 
-		setSession("theme", newTheme)
-	}
+    setSession("theme", newTheme);
+  };
 
-	const handleUserNavPanel = () => {
-		setUserNavPanel((current) => !current)
-	}
-	const handleBlur = () => {
-		setTimeout(() => setUserNavPanel(false), 200)
-	}
+  const handleUserNavPanel = () => {
+    setUserNavPanel((current) => !current);
+  };
+  const handleBlur = () => {
+    setTimeout(() => setUserNavPanel(false), 200);
+  };
 
-	// search
-	const handleSearch = (event) => {
-		const query = event.target.value
+  // search
+  const handleSearch = (event) => {
+    const query = event.target.value;
 
-		console.log(event)
+    console.log(event);
 
-		if (event.keyCode === 13 && query.length) {
-			navigate(`/search/${query}`)
-			console.log("hello")
-		}
-	}
+    if (event.keyCode === 13 && query.length) {
+      navigate(`/search/${query}`);
+      console.log("hello");
+    }
+  };
 
-	useEffect(() => {
-		if (access_token) {
-			axios
-				.get(`/api/v1/notifications/new`, {
-					headers: {
-						Authorization: `Bearer ${access_token}`,
-					},
-				})
-				.then(({ data }) => {
-					updateUserData({
-						type: "LOGIN",
-						payload: { ...userData, ...data },
-					})
-				})
-				.catch((error) => {
-					console.log(error)
-				})
-		}
-	}, [access_token])
+  useEffect(() => {
+    if (access_token) {
+      axios
+        .get(`/api/v1/notifications/new`, {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        })
+        .then(({ data }) => {
+          updateUserData({
+            type: "LOGIN",
+            payload: { ...userData, ...data },
+          });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  }, [access_token]);
 
-	return (
-		<Fragment>
-			<nav className="navbar z-50">
-				<Link to="/" className="flex-none w-10">
-					<img
-						src={theme == "light" ? logoDark : logoLight}
-						alt="logo"
-						className="w-full"
-					/>
-				</Link>
+  return (
+    <Fragment>
+      <nav className="navbar z-50">
+        <Link to="/" className="flex-none w-10">
+          <img
+            src={theme == "light" ? logoDark : logoLight}
+            alt="logo"
+            className="w-full"
+          />
+        </Link>
 
-				<div
+        <div className="hidden md:flex items-center gap-8 ml-8">
+          <Link
+            to="/blog"
+            className="text-dark-grey hover:text-black dark:hover:text-white transition-colors"
+          >
+            Нийтлэл мэдээлэл
+          </Link>
+          <Link
+            to="/product"
+            className="text-dark-grey hover:text-black dark:hover:text-white transition-colors"
+          >
+            Бүтээгдэхүүн үйлчилгээ
+          </Link>
+          <Link
+            to="/lessons"
+            className="text-dark-grey hover:text-black dark:hover:text-white transition-colors"
+          >
+            Сургалт материал
+          </Link>
+          <Link
+            to="/podcast"
+            className="text-dark-grey hover:text-black dark:hover:text-white transition-colors"
+          >
+            Подкаст
+          </Link>
+          <Link
+            to="/about"
+            className="text-dark-grey hover:text-black dark:hover:text-white transition-colors"
+          >
+            Бидний тухай
+          </Link>
+        </div>
+
+        {/* <div
 					className={
 						"absolute bg-white w-full left-0 top-full mt-0.5 border-b border-grey py-4 px-[5vw] md:border-0 md:block md:relative md:inset-0 md:p-0 md:w-auto md:show " +
 						(searchboxVisibility ? "sow" : "hide")
@@ -102,37 +135,35 @@ const Navbar = () => {
 					/>
 
 					<i className="fi fi-rr-search absolute right-[10%] md:pointer-events-none md:left-5 top-1/2 -translate-y-1/2 text-xl text-dark-grey"></i>
-				</div>
+				</div> */}
 
-				<div className="flex items-center gap-3 md:gap-6 ml-auto">
-					<button
-						className="md:hidden bg-grey w-12 h-12 rounded-full flex items-center justify-center"
-						onClick={() =>
-							setSearchBoxVisibility((current) => !current)
-						}
-					>
-						<i className="fi fi-rr-search text-xl"></i>
-					</button>
-					<Link to="/editor" className="hidden md:flex gap-2 link">
+        <div className="flex items-right gap-3 md:gap-6 ml-auto">
+          <button
+            className="md:hidden bg-grey w-12 h-12 rounded-full flex items-center justify-center"
+            onClick={() => setSearchBoxVisibility((current) => !current)}
+          >
+            <i className="fi fi-rr-search text-xl"></i>
+          </button>
+          {/* <Link to="/editor" className="hidden md:flex gap-2 link">
 						<i className="fi fi-rr-file-edit"></i>
 						<p>Write</p>
-					</Link>
+					</Link> */}
 
-					{/* change theme */}
-					<button
-						className="w-12 h-12 rounded-full bg-grey relative hover:bg-black/20"
-						onClick={changeTheme}
-					>
-						<i
-							className={
-								"fi fi-rr-" +
-								(theme == "light" ? "moon-stars" : "sun") +
-								" text-2xl block mt-1"
-							}
-						></i>
-					</button>
+          {/* change theme */}
+          <button
+            className="w-12 h-12 rounded-full bg-grey relative hover:bg-black/20"
+            onClick={changeTheme}
+          >
+            <i
+              className={
+                "fi fi-rr-" +
+                (theme == "light" ? "moon-stars" : "sun") +
+                " text-2xl block mt-1"
+              }
+            ></i>
+          </button>
 
-					{access_token ? (
+          {/* {access_token ? (
 						<>
 							<Link to="/dashboard/notifications">
 								<button className="w-12 h-12 rounded-full bg-grey relative hover:bg-black/20">
@@ -171,13 +202,13 @@ const Navbar = () => {
 								Sign Up
 							</Link>
 						</>
-					)}
-				</div>
-			</nav>
+					)} */}
+        </div>
+      </nav>
 
-			<Outlet />
-		</Fragment>
-	)
-}
+      <Outlet />
+    </Fragment>
+  );
+};
 
-export default Navbar
+export default Navbar;
