@@ -503,3 +503,33 @@ export const deleteBlog = (req, res) => {
 			})
 		})
 }
+
+export const latestPodcast = async (req, res) => {
+    try {
+        const { page = 1, limit = 10 } = req.body;
+        const skipAmount = (page - 1) * limit;
+
+        // Find blogs that have 'podcast' in their tags
+        const blogs = await Blog.find({ 
+            tags: { $in: ['podcast'] } 
+        })
+        .sort({ publishedAt: -1 })
+        .skip(skipAmount)
+        .limit(limit);
+
+        if (!blogs.length) {
+            return res.status(404).json({ error: 'No podcast blogs found' });
+        }
+
+        return res.status(200).json({ 
+            blogs,
+            totalBlogs: await Blog.countDocuments({ tags: { $in: ['podcast'] } })
+        });
+
+    } catch (error) {
+        console.error('Error in latestPodcast:', error);
+        return res.status(500).json({ 
+            error: 'Error while fetching podcast blogs' 
+        });
+    }
+}

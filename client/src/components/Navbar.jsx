@@ -89,7 +89,7 @@ const Navbar = () => {
 
         <div className="hidden md:flex items-center gap-8 ml-8">
           <Link
-            to="/blog"
+            to="/blog-main"
             className="text-dark-grey hover:text-black dark:hover:text-white transition-colors"
           >
             Нийтлэл мэдээлэл

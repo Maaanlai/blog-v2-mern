@@ -16,6 +16,10 @@ import ChangePassword from "../screens/ChangePassword"
 import EditProfile from "../screens/EditProfile"
 import Notifications from "../screens/Notifications"
 import ManageBlogs from "../screens/ManageBlogs"
+import Courses from "../screens/Courses"
+import BlogMain from "../screens/BlogMain"
+import Podcast from "../screens/Podcast"
+import AboutUs from "../screens/AboutUs"
 
 import AdminAuth from "../screens/admin/AdminAuth"
 import Blogs from "../screens/admin/Blogs"
@@ -59,6 +63,10 @@ const Routes_ = () => {
 					<Route path="search/:query" element={<Search />} />
 					<Route path="user/:id" element={<UserProfile />} />
 					<Route path="blog/:blogId" element={<Blog />} />
+					<Route path="course" element={ <Courses />} />
+					<Route path="blog-main" element={ <BlogMain />} />
+					<Route path="podcast" element={ <Podcast />} />
+					<Route path="about" element={ <AboutUs />} />
 					<Route path="*" element={<PageNotFound />} />
 
 					<Route path="admin">
