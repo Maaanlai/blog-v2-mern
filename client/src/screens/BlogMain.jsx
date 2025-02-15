@@ -1,204 +1,128 @@
-import { useEffect, useState } from "react"
-import axios from "axios"
-import { filterPaginationData } from "../functions"
-import AnimationWrapper from "../components/common/AnimationWrapper"
-import Loader from "../components/common/Loader"
-import BlogCard from "../components/common/cards/BlogCard"
-import MinimalBlogPostCard from "../components/common/cards/MinimalBlogPostCard"
-import NodataMessage from "../components/common/NodataMessage"
-import LoadMoreBtn from "../components/common/buttons/LoadMoreBtn"
+import { useEffect, useState, useRef } from "react";
+import axios from "axios";
+import { filterPaginationData } from "../functions";
+import AnimationWrapper from "../components/common/AnimationWrapper";
+import Loader from "../components/common/Loader";
+import BlogCard from "../components/common/cards/BlogCard";
+import MinimalBlogPostCard from "../components/common/cards/MinimalBlogPostCard";
+import NodataMessage from "../components/common/NodataMessage";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import "swiper/css/pagination";
+import { Pagination } from "swiper/modules";
 
-const Home = () => {
-    const [blogs, setBlogs] = useState(null)
-    const [trendingBlogs, setTrendingBlogs] = useState(null)
-    const [pageState, setPageState] = useState("home")
+const BlogMain = () => {
+    const [blogs, setBlogs] = useState(null);
+    const [trendingBlogs, setTrendingBlogs] = useState(null);
+    const [pageState, setPageState] = useState("home");
+    const [error, setError] = useState(null); // Error state to track errors
+    const observer = useRef();
 
     const categories = [
         "finance", "programming", "fraud", "new", "trading",
         "business", "investing", "wealth", "economy",
-    ]
+    ];
 
     const fetchLatestBlogs = ({ page = 1 }) => {
-        axios
-            .post(`/api/v1/blogs/latest`, { page })
+        axios.post(`/api/v1/blogs/latest`, { page })
             .then(async ({ data }) => {
                 const formattedData = await filterPaginationData({
                     state: blogs,
                     data: data?.blogs,
                     page,
                     countRoute: "blogs/latest/total-posts",
-                })
-                setBlogs(formattedData)
+                });
+                setBlogs(formattedData);
             })
             .catch((error) => {
-                console.log(error)
-            })
-    }
-
-    const fetchBlogsByCategory = ({ page = 1 }) => {
-        axios
-            .post(`/api/v1/blogs/search`, {
-                tag: pageState,
-                page,
-            })
-            .then(async ({ data }) => {
-                const formattedData = await filterPaginationData({
-                    state: blogs,
-                    data: data?.blogs,
-                    page,
-                    countRoute: "blogs/search/total-posts",
-                    dataToSend: { tag: pageState },
-                })
-                setBlogs(formattedData)
-            })
-            .catch((error) => {
-                console.log(error)
-            })
-    }
+                console.log(error);
+                setError("Failed to load blogs. Please try again later.");
+            });
+    };
 
     const fetchTrendingBlogs = () => {
-        axios
-            .get(`/api/v1/blogs/trending`)
-            .then(({ data }) => {
-                setTrendingBlogs(data?.blogs)
-            })
+        axios.get(`/api/v1/blogs/trending`)
+            .then(({ data }) => setTrendingBlogs(data?.blogs))
             .catch((error) => {
-                console.log(error)
-            })
-    }
-
-    const handleLoadCategory = (event) => {
-        const category = event.target.innerText.toLowerCase()
-        setBlogs(null)
-
-        if (pageState === category) {
-            setPageState("home")
-            return
-        }
-
-        setPageState(category)
-    }
+                console.log(error);
+                setError("Failed to load trending blogs. Please try again later.");
+            });
+    };
 
     useEffect(() => {
-        setBlogs(null)
-        
-        if (pageState === "home") {
-            fetchLatestBlogs({ page: 1 })
-        } else {
-            fetchBlogsByCategory({ page: 1 })
-        }
+        setBlogs(null);
+        setError(null); // Reset error state when fetching blogs
+        fetchLatestBlogs({ page: 1 });
+        if (!trendingBlogs) fetchTrendingBlogs();
+    }, [pageState]);
 
-        if (!trendingBlogs) {
-            fetchTrendingBlogs()
-        }
-    }, [pageState])
+    useEffect(() => {
+        if (!blogs?.hasMore) return;
+        observer.current = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting) {
+                fetchLatestBlogs({ page: blogs.page + 1 });
+            }
+        });
+        observer.current.observe(document.getElementById("load-more"));
+        return () => observer.current.disconnect();
+    }, [blogs]);
+
+    const renderBlogCards = () => {
+        return blogs.results.map(blog => (
+            <AnimationWrapper key={blog.blog_id}>
+                <BlogCard blog={blog} overlay />
+            </AnimationWrapper>
+        ));
+    };
 
     return (
-        <AnimationWrapper>
-            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-                <div className="flex flex-col lg:flex-row gap-10">
-                    {/* Main Content */}
-                    <div className="flex-1">
-                        {/* Category Navigation */}
-                        <div className="mb-8">
-                            <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex gap-8">
+            {/* Sidebar */}
+            <aside className="w-1/4 hidden lg:block">
+                <div className="bg-white p-4 rounded-lg shadow">
+                    <h2 className="text-lg font-bold mb-4">Categories</h2>
+                    <ul className="space-y-2">
+                        {categories.map(category => (
+                            <li key={category}>
                                 <button 
-                                    className={"px-4 py-2 rounded-full whitespace-nowrap transition-colors " + 
-                                        (pageState === "home" ? "bg-black text-white" : "bg-gray-100")}
-                                    onClick={() => setPageState("home")}
+                                    className={`w-full text-left px-3 py-2 rounded-lg transition ${pageState === category ? "bg-black text-white" : "bg-gray-100 hover:bg-gray-200"}`}
+                                    onClick={() => setPageState(category)}
                                 >
-                                    All Posts
+                                    {category}
                                 </button>
-                                {categories.map((category) => (
-                                    <button
-                                        key={category}
-                                        className={"px-4 py-2 rounded-full whitespace-nowrap transition-colors " + 
-                                            (pageState === category ? "bg-black text-white" : "bg-gray-100")}
-                                        onClick={handleLoadCategory}
-                                    >
-                                        {category}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Blog Posts Grid */}
-                        {blogs === null ? (
-                            <Loader />
-                        ) : blogs.results.length ? (
-                            <div className="grid gap-8">
-                                {blogs.results.map((blog, index) => (
-                                    <AnimationWrapper
-                                        key={blog?.blog_id}
-                                        transition={{
-                                            duration: 1,
-                                            delay: index * 0.1,
-                                        }}
-                                    >
-                                        <BlogCard
-                                            blog={blog}
-                                            author={blog?.author?.personal_info}
-                                        />
-                                    </AnimationWrapper>
-                                ))}
-                            </div>
-                        ) : (
-                            <NodataMessage message="No blog published" />
-                        )}
-
-                        {/* Load More Button */}
-                        {blogs?.hasMore && (
-                            <div className="mt-10">
-                                <LoadMoreBtn
-                                    state={blogs}
-                                    fetchDataFunc={
-                                        pageState === "home"
-                                            ? fetchLatestBlogs
-                                            : fetchBlogsByCategory
-                                    }
-                                />
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Sidebar */}
-                    {/* <div className="lg:w-[350px] shrink-0">
-                        <div className="sticky top-8 space-y-8">
-                            {/* Trending Section */}
-                            {/* <div className="bg-white rounded-xl shadow-sm p-6">
-                                <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                                    Trending <i className="fi fi-rr-arrow-trend-up"></i>
-                                </h2>
-                                
-                                {trendingBlogs === null ? (
-                                    <Loader />
-                                ) : trendingBlogs.length ? (
-                                    <div className="space-y-5">
-                                        {trendingBlogs.map((blog, index) => (
-                                            <AnimationWrapper
-                                                key={blog?.blog_id}
-                                                transition={{
-                                                    duration: 1,
-                                                    delay: index * 0.1,
-                                                }}
-                                            >
-                                                <MinimalBlogPostCard
-                                                    blog={blog}
-                                                    index={index}
-                                                />
-                                            </AnimationWrapper>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <NodataMessage message="No trending blogs" />
-                                )}
-                            </div>
-                        </div> */}
-                    {/* </div> */} 
+                            </li>
+                        ))}
+                    </ul>
                 </div>
-            </section>
-        </AnimationWrapper>
-    )
-}
+                <div className="mt-8 bg-white p-4 rounded-lg shadow">
+                    <h2 className="text-lg font-bold mb-4">Trending</h2>
+                    <Swiper pagination={true} modules={[Pagination]} className="h-80">
+                        {trendingBlogs?.map((blog, index) => (
+                            <SwiperSlide key={index}>
+                                <MinimalBlogPostCard blog={blog} />
+                            </SwiperSlide>
+                        ))}
+                    </Swiper>
+                </div>
+            </aside>
+            
+            {/* Main Content */}
+            <main className="flex-1">
+                <div className="grid gap-8">
+                    {error ? (
+                        <div className="text-center text-red-600">{error}</div> // Show error message if any error occurred
+                    ) : blogs === null ? (
+                        <Loader />
+                    ) : blogs.results.length ? (
+                        renderBlogCards()
+                    ) : (
+                        <NodataMessage message="No blog published" />
+                    )}
+                </div>
+                <div id="load-more" className="h-10" />
+            </main>
+        </div>
+    );
+};
 
-export default Home
+export default BlogMain;

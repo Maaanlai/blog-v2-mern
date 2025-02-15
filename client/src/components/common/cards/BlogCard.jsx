@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { getDate } from "../../../utils/getDate";
 
-const BlogCard = ({ blog, author }) => {
+const BlogCard = ({ blog }) => {
     const {
         title,
         des,
@@ -10,9 +10,10 @@ const BlogCard = ({ blog, author }) => {
         publishedAt,
         activity: { total_likes },
         blog_id: id,
+        author,  
     } = blog;
 
-    const { fullName, username, profile_img } = author;
+    const { fullName, username, profile_img } = author?.personal_info || {};
 
     return (
         <Link
@@ -47,16 +48,16 @@ const BlogCard = ({ blog, author }) => {
                 <div className="mt-6 flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                         <img
-                            src={profile_img}
-                            alt={fullName}
+                            src={profile_img || "/default-avatar.png"}  // Fallback to a default image if profile_img is missing
+                            alt={fullName || "Author"}
                             className="w-10 h-10 rounded-full border-2 border-white shadow-sm"
                         />
                         <div>
                             <p className="text-sm font-medium text-gray-900">
-                                {fullName}
+                                {fullName || "Anonymous"}  {/* Fallback to "Anonymous" if fullName is missing */}
                             </p>
                             <p className="text-sm text-gray-500">
-                                @{username}
+                                @{username || "no-username"}  {/* Fallback to "no-username" if username is missing */}
                             </p>
                         </div>
                     </div>

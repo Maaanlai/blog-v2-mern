@@ -95,7 +95,7 @@ const Navbar = () => {
             Нийтлэл мэдээлэл
           </Link>
           <Link
-            to="/product"
+            to="/products"
             className="text-dark-grey hover:text-black dark:hover:text-white transition-colors"
           >
             Бүтээгдэхүүн үйлчилгээ

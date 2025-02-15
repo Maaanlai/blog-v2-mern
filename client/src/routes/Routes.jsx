@@ -20,6 +20,7 @@ import Courses from "../screens/Courses"
 import BlogMain from "../screens/BlogMain"
 import Podcast from "../screens/Podcast"
 import AboutUs from "../screens/AboutUs"
+import Products from "../screens/Products"
 
 import AdminAuth from "../screens/admin/AdminAuth"
 import Blogs from "../screens/admin/Blogs"
@@ -67,6 +68,7 @@ const Routes_ = () => {
 					<Route path="blog-main" element={ <BlogMain />} />
 					<Route path="podcast" element={ <Podcast />} />
 					<Route path="about" element={ <AboutUs />} />
+					<Route path="products" element={ <Products />} />
 					<Route path="*" element={<PageNotFound />} />
 
 					<Route path="admin">
