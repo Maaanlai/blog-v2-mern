@@ -38,8 +38,17 @@ export const blogApi = createApi({
         };
       },
     }),
+    getLastestBlogs: build.mutation<{ status: number; blogs: Blog[] }, any>({
+      query: (query) => {
+        return {
+          url: "/latest",
+          method: "POST",
+          body: query,
+        };
+      },
+    }),
   }),
 });
 
 export type { PersonalInfo, Activity, Blog };
-export const { useSearchBlogsMutation } = blogApi;
+export const { useSearchBlogsMutation, useGetLastestBlogsMutation } = blogApi;

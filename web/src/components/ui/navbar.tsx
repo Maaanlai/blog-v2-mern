@@ -51,7 +51,7 @@ function Navbar({ items }: { items: NavbarItem[] }) {
               type="text"
               id="email-adress-icon"
               className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2"
-              placeholder="Search..."
+              placeholder="Хайлт хийх"
             />
           </div>
           <button
