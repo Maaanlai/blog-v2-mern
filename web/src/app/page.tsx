@@ -72,12 +72,12 @@ export default function Home() {
         swipeable
         responsive={responsive}
         className="w-full"
-        itemClass="h-[400px] mx-5 mt-[100px]"
+        itemClass="mx-5 mt-[100px]"
       >
         {isLoading && <p>Loading...</p>}
         {blogResponse?.blogs?.map((blog, index) => (
           <Card
-            className="h-[400px] flex justify-end p-0"
+            className="h-[400px] flex justify-end p-0 hover:scale-103 transition-all duration-300 relative overflow-visible"
             key={index}
             style={{
               backgroundImage: `url(${blog.banner})`,
@@ -85,6 +85,7 @@ export default function Home() {
               backgroundPosition: "center",
               zIndex: -1,
             }}
+            onClick={() => (window.location.href = `/blog/${blog.blog_id}`)}
           >
             <div className="h-[100px] p-5 bg-black/50 rounded-xl">
               <p className="text-white font-bold z-10">{blog.title}</p>
