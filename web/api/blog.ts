@@ -31,6 +31,17 @@ export const blogApi = createApi({
   reducerPath: "blogApi",
   baseQuery: fetchBaseQuery({ baseUrl: "http://127.0.0.1:9000/api/v1/blogs" }),
   endpoints: (build) => ({
+    getBlogById: build.mutation<{ status: number; blog: Blog }, { id: string }>(
+      {
+        query: ({ id }) => {
+          return {
+            url: `/get-blog`,
+            method: "POST",
+            body: { blog_id: id },
+          };
+        },
+      }
+    ),
     searchBlogs: build.mutation<{ status: number; blogs: Blog[] }, any>({
       query: (query) => {
         return {
@@ -53,4 +64,8 @@ export const blogApi = createApi({
 });
 
 export type { PersonalInfo, Activity, Blog };
-export const { useSearchBlogsMutation, useGetLastestBlogsMutation } = blogApi;
+export const {
+  useSearchBlogsMutation,
+  useGetLastestBlogsMutation,
+  useGetBlogByIdMutation,
+} = blogApi;
