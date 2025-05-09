@@ -20,7 +20,9 @@ type Blog = {
   des: string;
   content: any[];
   tags: string[];
-  author: PersonalInfo;
+  author: {
+    personal_info: PersonalInfo;
+  };
   activity: Activity;
   publishedAt: string;
 };

@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Navbar } from "@/components/ui/navbar";
-import { store } from "../../api/store";
-import { Provider } from "react-redux";
+import "@mantine/core/styles.css";
 import { ReduxProvider } from "@/providers/ReduxProvider";
+import {
+  ColorSchemeScript,
+  MantineProvider,
+  mantineHtmlProps,
+} from "@mantine/core";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,19 +30,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" {...mantineHtmlProps}>
+      <head>
+        <ColorSchemeScript />
+      </head>
       <ReduxProvider>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col w-full relative`}
         >
-          <Navbar
-            items={[
-              { label: "Home", href: "/" },
-              { label: "About", href: "/about" },
-              { label: "Contact", href: "/contact" },
-            ]}
-          />
-          {children}
+          <MantineProvider>{children}</MantineProvider>
         </body>
       </ReduxProvider>
     </html>
