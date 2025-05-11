@@ -29,17 +29,6 @@ interface MenuItem {
 
 export const menu: MenuItem[] = [
   {
-    header: "Overview",
-    section: [
-      {
-        name: "Welcome",
-        href: paths.dashboard.home,
-        icon: PiStarDuotone,
-      },
-    ],
-  },
-
-  {
     header: "Apps",
     section: [
       {
