@@ -8,6 +8,7 @@ import {
   ColorSchemeScript,
   MantineProvider,
   Stack,
+  createTheme,
   mantineHtmlProps,
 } from "@mantine/core";
 import { HeaderSearch } from "../../components/header";
@@ -27,6 +28,10 @@ export const metadata: Metadata = {
   description: "Blog website built with Next.js and Tailwind CSS",
 };
 
+const theme = createTheme({
+  fontFamily: "Inter, sans-serif",
+});
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -41,7 +46,7 @@ export default function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased `}
         >
-          <MantineProvider forceColorScheme="light">
+          <MantineProvider forceColorScheme="light" theme={theme}>
             <Stack w={"100%"} justify="start" mt={0} style={{ padding: "5px" }}>
               <HeaderSearch />
               {children}
