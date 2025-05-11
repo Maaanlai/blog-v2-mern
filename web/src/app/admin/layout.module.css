@@ -1,5 +1,5 @@
 :root {
-  --sidebar-width-xl: 270px;
+  --sidebar-width-xl: 400px;
   --sidebar-width-2xl: 288px;
 }
 
@@ -14,12 +14,12 @@
   flex-direction: column;
   width: 100%;
 
-  @media (min-width: $mantine-breakpoint-xl) {
+  @media (min-width: var(--mantine-breakpoint-xl)) {
     margin-inline-start: var(--sidebar-width-xl);
     width: calc(100% - var(--sidebar-width-xl));
   }
 
-  @media (min-width: $mantine-breakpoint-2xl) {
+  @media (min-width: var(--mantine-breakpoint-2xl)) {
     margin-inline-start: var(--sidebar-width-2xl);
     width: calc(100% - var(--sidebar-width-2xl));
   }
@@ -31,24 +31,24 @@
   flex-direction: column;
   padding: 0.5rem 1rem 1.5rem;
 
-  @media (min-width: $mantine-breakpoint-md) {
+  @media (min-width: var(--mantine-breakpoint-md)) {
     padding-left: 1.25rem;
     padding-right: 1.25rem;
   }
 
-  @media (min-width: $mantine-breakpoint-lg) {
+  @media (min-width: var(--mantine-breakpoint-lg)) {
     padding-left: 1.5rem;
     padding-right: 1.5rem;
     padding-bottom: 2rem;
   }
 
-  @media (min-width: $mantine-breakpoint-3xl) {
+  @media (min-width:var(--mantine-breakpoint-3xl)) {
     padding-left: 2rem;
     padding-right: 2rem;
     padding-top: 1rem;
   }
 
-  @media (min-width: $mantine-breakpoint-4xl) {
+  @media (min-width: var(--mantine-breakpoint-4xl)) {
     padding-left: 2.5rem;
     padding-right: 2.5rem;
     padding-bottom: 2.25rem;
@@ -63,13 +63,13 @@
   height: 100%;
   padding-bottom: var(--mantine-spacing-md);
 
-  @media (min-width: $mantine-breakpoint-xl) {
+  @media (min-width: var(--mantine-breakpoint-xl)) {
     display: flex;
     flex-direction: column;
     width: var(--sidebar-width-xl);
   }
 
-  @media (min-width: $mantine-breakpoint-2xl) {
+  @media (min-width: var(--mantine-breakpoint-2xl)) {
     width: var(--sidebar-width-2xl);
   }
 }

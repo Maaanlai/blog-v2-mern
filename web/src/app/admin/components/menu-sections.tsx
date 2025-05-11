@@ -1,17 +1,9 @@
 import { ElementType } from "react";
 import {
+  PiArchiveDuotone,
   PiChartLineUpDuotone,
-  PiChatCenteredDotsDuotone,
-  PiKanbanDuotone,
-  PiLockKeyDuotone,
-  PiShieldCheckDuotone,
-  PiSquaresFourDuotone,
-  PiStarDuotone,
-  PiTableDuotone,
-  PiUserPlusDuotone,
   PiUsersDuotone,
 } from "react-icons/pi";
-import { paths } from "./paths";
 
 interface MenuItem {
   header: string;
@@ -29,12 +21,12 @@ interface MenuItem {
 
 export const menu: MenuItem[] = [
   {
-    header: "Apps",
+    header: "Overview",
     section: [
       {
-        name: "Kanban",
-        href: paths.dashboard.apps.kanban,
-        icon: PiKanbanDuotone,
+        name: "Dashboard",
+        href: "/admin",
+        icon: PiChartLineUpDuotone,
       },
     ],
   },
@@ -43,62 +35,14 @@ export const menu: MenuItem[] = [
     header: "Management",
     section: [
       {
-        name: "Customers",
+        name: "Users",
         icon: PiUsersDuotone,
-        href: paths.dashboard.management.customers.root,
-        dropdownItems: [
-          {
-            name: "List",
-            href: paths.dashboard.management.customers.list,
-          },
-        ],
-      },
-    ],
-  },
-
-  {
-    header: "Widgets",
-    section: [
-      {
-        name: "Charts",
-        href: paths.dashboard.widgets.charts,
-        icon: PiChartLineUpDuotone,
+        href: "/admin/user",
       },
       {
-        name: "Metrics",
-        href: paths.dashboard.widgets.metrics,
-        icon: PiSquaresFourDuotone,
-      },
-      {
-        name: "Tables",
-        href: paths.dashboard.widgets.tables,
-        icon: PiTableDuotone,
-      },
-    ],
-  },
-
-  {
-    header: "Authentication",
-    section: [
-      {
-        name: "Register",
-        href: paths.auth.register,
-        icon: PiUserPlusDuotone,
-      },
-      {
-        name: "Login",
-        href: paths.auth.login,
-        icon: PiShieldCheckDuotone,
-      },
-      {
-        name: "Forgot Password",
-        href: paths.auth.forgotPassword,
-        icon: PiLockKeyDuotone,
-      },
-      {
-        name: "OTP",
-        href: paths.auth.otp,
-        icon: PiChatCenteredDotsDuotone,
+        name: "Blogs",
+        icon: PiArchiveDuotone,
+        href: "/admin/blog",
       },
     ],
   },
