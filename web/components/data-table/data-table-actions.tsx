@@ -1,3 +1,5 @@
+"use client";
+
 import {
   PiTrashDuotone as DeleteIcon,
   PiPencilDuotone as EditIcon,

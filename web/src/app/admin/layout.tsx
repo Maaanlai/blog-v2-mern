@@ -1,6 +1,13 @@
 "use client";
 
-import { Breadcrumbs, Paper, ScrollArea, Stack, Title } from "@mantine/core";
+import {
+  Breadcrumbs,
+  Flex,
+  Paper,
+  ScrollArea,
+  Stack,
+  Title,
+} from "@mantine/core";
 import classes from "./layout.module.css";
 import Sidebar from "./components/sidebar";
 import { usePathname } from "next/navigation";
@@ -44,14 +51,17 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   return (
-    <div className={classes.root}>
+    <div className={classes.root} style={{ width: "100vw", height: "100vh" }}>
       <Paper className={classes.sidebarWrapper} withBorder>
         <ScrollArea flex="1" px="md" miw={"300px"}>
           <Sidebar />
         </ScrollArea>
       </Paper>
-      <div className={classes.content}>
-        <Stack p={10}>
+      <div
+        className={classes.content}
+        style={{ width: "100vw", padding: "10px" }}
+      >
+        <Stack p={10} w={"100%"}>
           <Title order={2}>{pathnameToLabel(pathname)}</Title>
           <Breadcrumbs
             separator={

@@ -1,3 +1,5 @@
+"use client";
+
 import { TextInput, type TextInputProps } from "@mantine/core";
 import { UseDataTableReturn } from "./use-data-table";
 

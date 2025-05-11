@@ -1,3 +1,5 @@
+"use client";
+
 import { useMemo, useState } from "react";
 import { DataTableSortStatus } from "mantine-datatable";
 import { useDebouncedValue } from "@mantine/hooks";

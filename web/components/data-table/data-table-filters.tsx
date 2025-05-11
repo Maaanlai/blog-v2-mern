@@ -1,3 +1,5 @@
+"use client";
+
 import { forwardRef } from "react";
 import { PiTrashBold as ClearIcon } from "react-icons/pi";
 import {
