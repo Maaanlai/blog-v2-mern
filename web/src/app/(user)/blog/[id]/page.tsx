@@ -2,7 +2,7 @@
 
 import React, { useEffect } from "react";
 import { useParams } from "next/navigation";
-import { useGetBlogByIdMutation } from "../../../../api/blog";
+import { useGetBlogByIdMutation } from "../../../../../api/blog";
 import { Badge, Button, Chip, Flex, Text } from "@mantine/core";
 
 function page() {
@@ -28,7 +28,13 @@ function page() {
       </Text>
       {blogData?.blog?.tags?.map((item, index) => {
         return (
-          <Button key={index} mt={16} size={"sm"} color={"dimmed"}>
+          <Button
+            key={index}
+            mt={16}
+            size={"sm"}
+            variant="outline"
+            w={"fit-content"}
+          >
             {item}
           </Button>
         );

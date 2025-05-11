@@ -10,7 +10,7 @@ import {
   Image,
   Text,
 } from "@mantine/core";
-import { useGetLastestBlogsMutation } from "../../api/blog";
+import { useGetLastestBlogsMutation } from "../../../api/blog";
 import { useEffect } from "react";
 import { motion } from "motion/react";
 
