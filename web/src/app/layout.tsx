@@ -4,10 +4,13 @@ import "./globals.css";
 import "@mantine/core/styles.css";
 import { ReduxProvider } from "@/providers/ReduxProvider";
 import {
+  AppShell,
   ColorSchemeScript,
   MantineProvider,
+  Stack,
   mantineHtmlProps,
 } from "@mantine/core";
+import { HeaderSearch } from "../../components/header";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,9 +39,14 @@ export default function RootLayout({
       </head>
       <ReduxProvider>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col w-full relative`}
+          className={`${geistSans.variable} ${geistMono.variable} antialiased `}
         >
-          <MantineProvider>{children}</MantineProvider>
+          <MantineProvider forceColorScheme="light">
+            <Stack w={"100%"} justify="start" mt={0} style={{ padding: "5px" }}>
+              <HeaderSearch />
+              {children}
+            </Stack>
+          </MantineProvider>
         </body>
       </ReduxProvider>
     </html>
