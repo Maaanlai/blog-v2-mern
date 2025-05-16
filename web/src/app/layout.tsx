@@ -9,6 +9,7 @@ import { MantineProvider } from "@mantine/core";
 import { ReduxProvider } from "@/providers/ReduxProvider";
 import AuthProvider from "@/providers/AuthProvider";
 import "@mantine/notifications/styles.css";
+import { Notifications } from "@mantine/notifications";
 
 const theme = createTheme({
   fontFamily: "Inter, sans-serif",
@@ -26,9 +27,11 @@ export default function UserLayout({
       </head>
       <body>
         <MantineProvider theme={theme}>
-          <AuthProvider>
-            <ReduxProvider>{children}</ReduxProvider>
-          </AuthProvider>
+          <Notifications>
+            <AuthProvider>
+              <ReduxProvider>{children}</ReduxProvider>
+            </AuthProvider>
+          </Notifications>
         </MantineProvider>
       </body>
     </html>

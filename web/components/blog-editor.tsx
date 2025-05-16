@@ -10,6 +10,7 @@ import Image from "@tiptap/extension-image";
 import { useEffect } from "react";
 import CodeBlock from "@tiptap/extension-code-block";
 import { useUpdateBlogMutation } from "../api/blog";
+import { notifications } from "@mantine/notifications";
 
 function BlogEditor({ blogId, content }: { blogId: string; content: string }) {
   const editor = useEditor({
@@ -89,7 +90,10 @@ function BlogEditor({ blogId, content }: { blogId: string; content: string }) {
         <Button
           aria-label="Save Content"
           onClick={() => {
-            updateContent({ blog_id: blogId, content: editor?.getHTML() });
+            updateContent({ blog_id: blogId, content: editor?.getHTML() }).then(
+              () =>
+                notifications.show({ message: "Blog edited!", color: "green" })
+            );
           }}
         >
           Save Content
