@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 type PersonalInfo = {
+  access_token: string;
   fullName: string;
   username: string;
   profile_img: string;
@@ -33,7 +34,6 @@ export const blogApi = createApi({
     baseUrl: "http://127.0.0.1:9000/api/v1/blogs",
     headers: {
       "Content-Type": "application/json",
-      // Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       Authorization:
         "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MWEzZGZmNWY3OTc2Zjk5N2VmNmJlMyIsImlhdCI6MTc0NzQwMTI1NH0.-iNM8ZB5Qg6hWxD-N-xC1r8bTZsvUt585MSImnPNW_w",
     },

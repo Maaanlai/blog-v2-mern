@@ -1,11 +1,23 @@
 "use client";
 
-import { IconSearch } from "@tabler/icons-react";
-import { Autocomplete, Burger, Button, Group, Text } from "@mantine/core";
+import { IconLogout, IconSearch, IconUser } from "@tabler/icons-react";
+import {
+  Autocomplete,
+  Avatar,
+  Burger,
+  Button,
+  Group,
+  Menu,
+  Skeleton,
+  Text,
+} from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import classes from "./header.module.css";
 import Logo from "./logo";
 import { useRouter } from "next/navigation";
+import { useGetMeQuery } from "../api/auth";
+import { useEffect, useState } from "react";
+import { useAuth } from "@/providers/AuthProvider";
 
 const links = [
   { link: "/about", label: "Бидний Тухай" },
@@ -14,7 +26,9 @@ const links = [
 
 export function HeaderSearch() {
   const router = useRouter();
+  const { token, isAuthenticated } = useAuth();
   const [opened, { toggle }] = useDisclosure(false);
+  const { data: userData, refetch, isLoading, isError } = useGetMeQuery({});
 
   const items = links.map((link) => (
     <Text
@@ -29,6 +43,11 @@ export function HeaderSearch() {
       {link.label}
     </Text>
   ));
+
+  useEffect(() => {
+    refetch();
+    console.log("Changed");
+  }, [token, isAuthenticated]);
 
   return (
     <header className={classes.header}>
@@ -57,13 +76,48 @@ export function HeaderSearch() {
             ]}
             visibleFrom="xs"
           />
-          <Button
-            onClick={() => {
-              router.push("/login");
-            }}
-          >
-            Login
-          </Button>
+          {isLoading ? (
+            <Skeleton height={"100%"} width={100} />
+          ) : !isError && userData?.user?.personal_info?.fullName ? (
+            <Menu trigger="hover" width={200}>
+              <Menu.Target>
+                <Group>
+                  <Avatar src={userData?.user?.personal_info?.profile_img} />
+                  <Text size="sm">
+                    {userData?.user?.personal_info?.fullName}
+                  </Text>
+                </Group>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Item
+                  leftSection={<IconUser size={14} />}
+                  onClick={() => {
+                    router.push("/admin");
+                  }}
+                >
+                  Admin
+                </Menu.Item>
+                <Menu.Item
+                  leftSection={<IconLogout size={14} />}
+                  color="red"
+                  onClick={() => {
+                    localStorage.removeItem("token");
+                    refetch();
+                  }}
+                >
+                  Logout
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
+          ) : (
+            <Button
+              onClick={() => {
+                router.push("/login");
+              }}
+            >
+              Login
+            </Button>
+          )}
         </Group>
       </div>
     </header>
