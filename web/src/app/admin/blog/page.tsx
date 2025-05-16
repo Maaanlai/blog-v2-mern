@@ -1,8 +1,9 @@
 "use client";
 
-import { Button, Flex, Table } from "@mantine/core";
+import { ActionIcon, Button, Flex, Stack, Table } from "@mantine/core";
 import { useSearchBlogsMutation } from "../../../../api/blog";
 import { useEffect } from "react";
+import { IconPlus } from "@tabler/icons-react";
 
 function BlogPage() {
   const [searchBlogs, { data: blogList }] = useSearchBlogsMutation();
@@ -11,32 +12,28 @@ function BlogPage() {
     <Table.Tr
       key={index}
       style={{
-        background: index % 2 === 0 ? "#f8fafc" : "white",
         transition: "background 0.2s",
         cursor: "pointer",
+        alignItems: "center",
       }}
-      onMouseEnter={(e) => (e.currentTarget.style.background = "#e0e7ff")}
-      onMouseLeave={(e) =>
-        (e.currentTarget.style.background =
-          index % 2 === 0 ? "#f8fafc" : "white")
-      }
     >
       <Table.Td>{blog.title}</Table.Td>
       <Table.Td>{blog.author.personal_info.username}</Table.Td>
       <Table.Td>
         {blog.tags?.map((tag, index) => {
           return (
-            <span
+            <Button
               key={index}
+              size="compact-sm"
+              fw={400}
               style={{
-                background: "#e0e7ff",
                 padding: "4px 8px",
                 borderRadius: "4px",
                 marginRight: "4px",
               }}
             >
               {tag}
-            </span>
+            </Button>
           );
         })}
       </Table.Td>
@@ -60,51 +57,32 @@ function BlogPage() {
     </Table.Tr>
   ));
 
-  /*
-  {
-  "activity": {
-    "total_likes": 0,
-    "total_comments": 0,
-    "total_reads": 12,
-    "total_parent_comments": 0
-  },
-  "blog_id": "Lorem-Ipsum-dolores-3g4YWUWYlz46VZ8_jI-2YT",
-  "title": "Lorem Ipsum dolores 3",
-  "banner": "https://ichef.bbci.co.uk/ace/standard/976/cpsprodpb/14235/production/_100058428_mediaitem100058424.jpg",
-  "des": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. ",
-  "tags": [
-    "news"
-  ],
-  "author": {
-    "personal_info": {
-      "fullName": "tester123",
-      "username": "archerdoc13",
-      "profile_img": "https://api.dicebear.com/6.x/adventurer-neutral/svg?seed=Abby"
-    }
-  },
-  "publishedAt": "2025-05-07T17:36:00.141Z"
-}
-  */
-
   useEffect(() => {
     searchBlogs({});
   }, []);
 
   return (
-    <Table>
-      <Table.Thead>
-        <Table.Tr>
-          <Table.Th>Title</Table.Th>
-          <Table.Th>User</Table.Th>
-          <Table.Th>Tags</Table.Th>
-          <Table.Th>Likes</Table.Th>
-          <Table.Th>Comments</Table.Th>
-          <Table.Th>Reads</Table.Th>
-          <Table.Th>Actions</Table.Th>
-        </Table.Tr>
-      </Table.Thead>
-      <Table.Tbody>{rows}</Table.Tbody>
-    </Table>
+    <Stack>
+      <Flex justify={"end"} px={"md"}>
+        <ActionIcon size={"md"} fw={400}>
+          <IconPlus />
+        </ActionIcon>
+      </Flex>
+      <Table border={1} striped highlightOnHover>
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th>Title</Table.Th>
+            <Table.Th>User</Table.Th>
+            <Table.Th>Tags</Table.Th>
+            <Table.Th>Likes</Table.Th>
+            <Table.Th>Comments</Table.Th>
+            <Table.Th>Reads</Table.Th>
+            <Table.Th>Actions</Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>{rows}</Table.Tbody>
+      </Table>
+    </Stack>
   );
 }
 

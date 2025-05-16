@@ -1,29 +1,33 @@
 "use client";
 
 import { IconSearch } from "@tabler/icons-react";
-import { Autocomplete, Burger, Group } from "@mantine/core";
+import { Autocomplete, Burger, Button, Group, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import classes from "./header.module.css";
+import Logo from "./logo";
+import { useRouter } from "next/navigation";
 
 const links = [
-  { link: "/about", label: "Features" },
-  { link: "/pricing", label: "Pricing" },
-  { link: "/learn", label: "Learn" },
-  { link: "/community", label: "Community" },
+  { link: "/about", label: "Бидний Тухай" },
+  { link: "/contact", label: "Холбогдох" },
 ];
 
 export function HeaderSearch() {
+  const router = useRouter();
   const [opened, { toggle }] = useDisclosure(false);
 
   const items = links.map((link) => (
-    <a
+    <Text
       key={link.label}
-      href={link.link}
       className={classes.link}
-      onClick={(event) => event.preventDefault()}
+      component="a"
+      href={link.link}
+      style={{
+        fontFamily: "'Poppins', sans-serif",
+      }}
     >
       {link.label}
-    </a>
+    </Text>
   ));
 
   return (
@@ -31,8 +35,7 @@ export function HeaderSearch() {
       <div className={classes.inner}>
         <Group>
           <Burger opened={opened} onClick={toggle} size="sm" hiddenFrom="sm" />
-          {/* <MantineLogo size={28} /> */}
-          <p>Logo</p>
+          <Logo />
         </Group>
 
         <Group>
@@ -54,6 +57,13 @@ export function HeaderSearch() {
             ]}
             visibleFrom="xs"
           />
+          <Button
+            onClick={() => {
+              router.push("/login");
+            }}
+          >
+            Login
+          </Button>
         </Group>
       </div>
     </header>
