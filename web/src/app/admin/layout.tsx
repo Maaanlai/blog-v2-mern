@@ -13,6 +13,7 @@ import Sidebar from "./components/sidebar";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { GoDotFill as BreadcrumbsSeparator } from "react-icons/go";
+import { useAuth } from "@/providers/AuthProvider";
 
 const pathnameToBreadcrumbs = (pathname: string) => {
   if (pathname.startsWith("/admin/user")) {
@@ -49,6 +50,19 @@ const pathnameToLabel = (pathname: string) => {
 
 function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { isAuthenticated } = useAuth();
+
+  if (!isAuthenticated) {
+    return (
+      <Flex
+        justify={"center"}
+        align={"center"}
+        style={{ width: "100vw", height: "100vh" }}
+      >
+        <Title order={2}>You are not authenticated</Title>
+      </Flex>
+    );
+  }
 
   return (
     <div className={classes.root} style={{ width: "100vw", height: "100vh" }}>

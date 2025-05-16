@@ -10,19 +10,24 @@ import {
   Notification,
 } from "@mantine/core";
 import { isEmail, useForm } from "@mantine/form";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useRegisterMutation } from "../../../../api/auth";
+import { useAuth } from "@/providers/AuthProvider";
 
-function Login() {
+function Register() {
   const router = useRouter();
-  const [isLoginError, setLoginError] = useState(false);
-  const [loginErrorMessage, setLoginErrorMessage] = useState("");
+  const { setToken, isAuthenticated } = useAuth();
+
+  const [register, { data: loginResponse, error: loginErrorMessage }] =
+    useRegisterMutation();
 
   const form = useForm({
     mode: "uncontrolled",
     initialValues: {
       email: "",
       password: "",
+      fullName: "",
     },
     validate: {
       email: isEmail("Invalid email address"),
@@ -34,66 +39,23 @@ function Login() {
     },
   });
 
-  // const { data: loginData, mutate: login } = useMutation({
-  //   mutationKey: ["login"],
-  //   mutationFn: async (credentials: any) => {
-  //     const response = await fetch(`${portfolioManagerURL}/api/user/login`, {
-  //       method: "POST",
-  //       body: JSON.stringify(credentials),
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //     });
-  //     if (response.status != 200) {
-  //       setLoginError(true);
-  //       setLoginErrorMessage("Invalid email or password");
-  //     } else {
-  //       setLoginError(false);
-  //     }
-  //     return response.json();
-  //   },
-  // });
-
-  // const { data: userData } = useQuery<any>({
-  //   queryKey: ["user_info_login"],
-
-  //   queryFn: async () => {
-  //     const token: string | null = localStorage.getItem("token");
-  //     if (token && token?.length > 0) {
-  //       const response = await fetch(`${portfolioManagerURL}/api/user`, {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       });
-  //       return response.json();
-  //     } else {
-  //       return {};
-  //     }
-  //   },
-  // });
-
-  // useEffect(() => {
-  //   if (loginData?.token) {
-  //     localStorage.setItem("token", loginData?.token);
-  //     queryClient.invalidateQueries({ queryKey: ["user_info_header"] });
-  //     router.push("/");
-  //   }
-  // }, [loginData]);
-
-  // useEffect(() => {
-  //   if (userData?.username) {
-  //     router.push("/");
-  //   }
-  // }, [userData]);
+  useEffect(() => {
+    if (loginResponse?.user && loginResponse?.user?.access_token) {
+      localStorage.setItem("token", loginResponse?.user?.access_token);
+      setToken(loginResponse?.user?.access_token);
+      router.push("/");
+    }
+  }, [loginResponse]);
 
   return (
-    <Flex w={"100%"} justify="center" mih={"60vh"}>
+    <Flex w={"100%"} justify="center" h={"100vh"} mt={"5rem"}>
       <Card
         shadow="md"
         w={{
           base: "80%",
           md: 500,
         }}
+        h={"500"}
       >
         <form
           style={{
@@ -105,16 +67,23 @@ function Login() {
             gap: "1rem",
           }}
           onSubmit={form.onSubmit((values) => {
-            // login(values);
+            register(values);
           })}
         >
-          <Title order={2}>Sign In</Title>
-          {isLoginError && (
-            <Notification color="red" w={"90%"} withCloseButton={false}>
-              {loginErrorMessage}
-            </Notification>
-          )}
+          <Title order={2}>Sign Up</Title>
+          {loginErrorMessage &&
+            "data" in loginErrorMessage &&
+            (loginErrorMessage as any)?.data?.message && (
+              <Notification color="red" w={"90%"} withCloseButton={false}>
+                {(loginErrorMessage as any)?.data?.message}
+              </Notification>
+            )}
           <TextInput w={"90%"} label="Email" {...form.getInputProps("email")} />
+          <TextInput
+            w={"90%"}
+            label="Full Name"
+            {...form.getInputProps("fullName")}
+          />
           <TextInput
             w={"90%"}
             label="Password"
@@ -126,7 +95,7 @@ function Login() {
           </Button>
           <Text c={"dimmed"}>
             Don&apos;t have an account yet?{" "}
-            <Anchor href="/user/register">Sign up</Anchor>
+            <Anchor href="/register">Sign up</Anchor>
           </Text>
         </form>
       </Card>
@@ -134,4 +103,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default Register;

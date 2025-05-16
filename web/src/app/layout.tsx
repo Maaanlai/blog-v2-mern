@@ -8,6 +8,7 @@ import "./globals.css";
 import { MantineProvider } from "@mantine/core";
 import { ReduxProvider } from "@/providers/ReduxProvider";
 import AuthProvider from "@/providers/AuthProvider";
+import "@mantine/notifications/styles.css";
 
 const theme = createTheme({
   fontFamily: "Inter, sans-serif",

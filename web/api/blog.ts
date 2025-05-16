@@ -80,6 +80,30 @@ export const blogApi = createApi({
         };
       },
     }),
+    getUploadURL: build.query<
+      {
+        status: number;
+        uploadUrl: string;
+      },
+      any
+    >({
+      query: () => ({
+        url: "/get-upload-url",
+        method: "GET",
+      }),
+    }),
+    createBlog: build.mutation<
+      { status: number; blog: Blog },
+      { title: string; content?: string; des: string; banner: string }
+    >({
+      query: (data) => {
+        return {
+          url: "/create",
+          method: "POST",
+          body: data,
+        };
+      },
+    }),
   }),
 });
 
@@ -89,4 +113,6 @@ export const {
   useGetLastestBlogsMutation,
   useGetBlogByIdMutation,
   useUpdateBlogMutation,
+  useLazyGetUploadURLQuery,
+  useCreateBlogMutation,
 } = blogApi;

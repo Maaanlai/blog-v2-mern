@@ -130,7 +130,9 @@ export default function Home() {
             >
               <Card padding={"lg"} radius="md">
                 <Card.Section>
-                  <Image src={blog.banner} />
+                  <Flex h={200} justify={"center"} align={"center"}>
+                    <Image src={blog.banner} h={200} fit="contain" />
+                  </Flex>
                 </Card.Section>
                 <Text mt={8} fw={"bold"} size="xl">
                   {blog.title}

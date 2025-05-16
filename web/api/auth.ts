@@ -27,7 +27,7 @@ export const authApi = createApi({
       },
     }),
     register: builder.mutation<
-      { status: number },
+      { status: number; message: string; user: PersonalInfo },
       { email: string; password: string; fullName: string }
     >({
       query: (data) => {

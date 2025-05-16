@@ -46,7 +46,6 @@ export function HeaderSearch() {
 
   useEffect(() => {
     refetch();
-    console.log("Changed");
   }, [token, isAuthenticated]);
 
   return (

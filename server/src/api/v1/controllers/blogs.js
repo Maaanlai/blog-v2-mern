@@ -87,12 +87,12 @@ export const createBlog = async (req, res) => {
       });
     }
 
-    if (!tags || tags.length > 10) {
-      return res.status(403).json({
-        status: 6001,
-        message: "Provide tags in order to publish the blog, Maximum 10",
-      });
-    }
+    // if (!tags || tags.length > 10) {
+    //   return res.status(403).json({
+    //     status: 6001,
+    //     message: "Provide tags in order to publish the blog, Maximum 10",
+    //   });
+    // }
   }
 
   tags = tags && tags.map((tag) => tag.toLowerCase());
