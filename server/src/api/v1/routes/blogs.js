@@ -1,43 +1,45 @@
-import express from "express"
+import express from "express";
 
 // middlewares
-import { verifyJWT } from "../../../middlewares/index.js"
+import { verifyJWT } from "../../../middlewares/index.js";
 import {
-    getUploadUrl,
-    createBlog,
-    latestBlogs,
-    trendingBlogs,
-    searchBlogs,
-    latestBlogsCount,
-    searchBlogsCount,
-    getBlog,
-    likeBlog,
-    isUserLiked,
-    deleteBlog,
-    latestPodcast,
-} from "../controllers/blogs.js"
+  getUploadUrl,
+  createBlog,
+  latestBlogs,
+  trendingBlogs,
+  searchBlogs,
+  latestBlogsCount,
+  searchBlogsCount,
+  getBlog,
+  likeBlog,
+  isUserLiked,
+  deleteBlog,
+  latestPodcast,
+  updateBlogContent,
+} from "../controllers/blogs.js";
 
-const router = express.Router()
+const router = express.Router();
 
-router.get("/get-upload-url", verifyJWT, getUploadUrl)
-router.post("/create", verifyJWT, createBlog)
+router.get("/get-upload-url", verifyJWT, getUploadUrl);
+router.post("/create", verifyJWT, createBlog);
+router.post("/update/content", verifyJWT, updateBlogContent);
 
-router.post("/search", searchBlogs)
-router.post("/search/total-posts", searchBlogsCount)
+router.post("/search", searchBlogs);
+router.post("/search/total-posts", searchBlogsCount);
 
-router.post("/latest", latestBlogs)
-router.post("/latest/total-posts", latestBlogsCount)
-router.post("/podcast", latestPodcast)
+router.post("/latest", latestBlogs);
+router.post("/latest/total-posts", latestBlogsCount);
+router.post("/podcast", latestPodcast);
 
-router.get("/trending", trendingBlogs)
+router.get("/trending", trendingBlogs);
 
-router.post("/get-blog", getBlog)
+router.post("/get-blog", getBlog);
 
-router.post("/like-blog", verifyJWT, likeBlog)
-router.post("/is-user-liked", verifyJWT, isUserLiked)
+router.post("/like-blog", verifyJWT, likeBlog);
+router.post("/is-user-liked", verifyJWT, isUserLiked);
 
-router.post("/delete", verifyJWT, deleteBlog)
+router.post("/delete", verifyJWT, deleteBlog);
 
 // router.post("/fetchUrl", verifyJWT, fetchUrl)
 
-export default router
+export default router;

@@ -87,13 +87,6 @@ export const createBlog = async (req, res) => {
       });
     }
 
-    if (!content.blocks.length) {
-      return res.status(403).json({
-        status: 6001,
-        message: "There must be some blog content to publish it",
-      });
-    }
-
     if (!tags || tags.length > 10) {
       return res.status(403).json({
         status: 6001,
@@ -179,6 +172,32 @@ export const createBlog = async (req, res) => {
           message: error?.message,
         });
       });
+  }
+};
+
+export const updateBlogContent = async (req, res) => {
+  const { blog_id, content } = req.body;
+  try {
+    const blog = await Blog.findOneAndUpdate(
+      { blog_id },
+      { content },
+      { new: true } // Return the updated document
+    );
+    if (!blog) {
+      return res.status(404).json({
+        status: 6001,
+        message: "Blog not found",
+      });
+    }
+    return res.status(200).json({
+      status: 6000,
+      blog,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: 6001,
+      message: error?.message,
+    });
   }
 };
 
@@ -349,6 +368,7 @@ export const getBlog = async (req, res) => {
     )
     .select("title des content banner activity publishedAt blog_id tags")
     .then((blog) => {
+      console.log(("Got blog", blog));
       /**
        * updating the `total_reads` count from the author details
        *
