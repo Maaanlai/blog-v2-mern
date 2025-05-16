@@ -23,7 +23,7 @@ export default function UserLayout({
         <ColorSchemeScript />
       </head>
       <body>
-        <MantineProvider forceColorScheme="light" theme={theme}>
+        <MantineProvider theme={theme}>
           <ReduxProvider>{children}</ReduxProvider>
         </MantineProvider>
       </body>

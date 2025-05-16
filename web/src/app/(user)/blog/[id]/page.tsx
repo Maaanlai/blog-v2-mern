@@ -3,48 +3,85 @@
 import React, { useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useGetBlogByIdMutation } from "../../../../../api/blog";
-import { Badge, Button, Chip, Flex, Text } from "@mantine/core";
+import {
+  Avatar,
+  Button,
+  Flex,
+  Group,
+  Image,
+  Skeleton,
+  Text,
+} from "@mantine/core";
+import "./blog.css";
 
 function page() {
-  const [getBlogById, { data: blogData }] = useGetBlogByIdMutation();
+  const [getBlogById, { data: blogData, isLoading }] = useGetBlogByIdMutation();
   const params = useParams<{ id: string }>();
 
   useEffect(() => {
     getBlogById({ id: params.id });
   }, []);
 
-  useEffect(() => {
-    console.log("blogData", blogData);
-  }, [blogData]);
-
   return (
-    <Flex direction={"column"} p={"lg"}>
-      <Text fw={"bold"} style={{ fontSize: "2rem" }}>
-        {blogData?.blog?.title}
-      </Text>
-
-      <Text mt={16} size={"sm"} color={"dimmed"}>
-        {blogData?.blog?.des}
-      </Text>
-      {blogData?.blog?.tags?.map((item, index) => {
-        return (
-          <Button
-            key={index}
-            mt={16}
-            size={"sm"}
-            variant="outline"
-            w={"fit-content"}
-          >
-            {item}
-          </Button>
-        );
-      })}
-      <Text mt={16} size={"sm"} color={"dimmed"}>
-        {blogData?.blog?.publishedAt}
-      </Text>
-      <Text mt={16} size={"sm"} color={"dimmed"}>
-        {blogData?.blog?.author?.personal_info?.username}
-      </Text>
+    <Flex direction={"column"} p={"lg"} align={"center"}>
+      {isLoading || !blogData ? (
+        <Skeleton height={"600px"} width={"50%"} />
+      ) : (
+        <></>
+      )}
+      <Flex
+        w={{
+          base: "90%",
+          sm: "90%",
+          md: "60%",
+          lg: "50%",
+          xl: "50%",
+        }}
+        direction="column"
+        gap={10}
+      >
+        <Image src={blogData?.blog?.banner} />
+        <Text fw={"bold"} style={{ fontSize: "2rem" }}>
+          {blogData?.blog?.title}
+        </Text>
+        <Group mt={8}>
+          <Avatar src={blogData?.blog.author.personal_info.profile_img} />
+          <Text size="sm">{blogData?.blog.author.personal_info.fullName}</Text>
+          <Text size="sm">
+            {blogData?.blog.publishedAt &&
+              new Date(blogData?.blog.publishedAt ?? "").toLocaleDateString(
+                "en-US",
+                {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                }
+              )}
+          </Text>
+        </Group>
+        {blogData?.blog?.tags?.map((item, index) => {
+          return (
+            <Button
+              key={index}
+              mt={16}
+              size={"sm"}
+              variant="outline"
+              w={"fit-content"}
+            >
+              {item}
+            </Button>
+          );
+        })}
+        {blogData?.blog && blogData?.blog?.content && (
+          <div
+            style={{
+              marginTop: "20px",
+            }}
+            className="blog-viewer"
+            dangerouslySetInnerHTML={{ __html: blogData.blog.content }}
+          />
+        )}
+      </Flex>
     </Flex>
   );
 }

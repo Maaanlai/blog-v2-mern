@@ -18,7 +18,7 @@ type Blog = {
   title: string;
   banner: string;
   des: string;
-  content: any[];
+  content: string;
   tags: string[];
   author: {
     personal_info: PersonalInfo;
@@ -29,7 +29,15 @@ type Blog = {
 
 export const blogApi = createApi({
   reducerPath: "blogApi",
-  baseQuery: fetchBaseQuery({ baseUrl: "http://127.0.0.1:9000/api/v1/blogs" }),
+  baseQuery: fetchBaseQuery({
+    baseUrl: "http://127.0.0.1:9000/api/v1/blogs",
+    headers: {
+      "Content-Type": "application/json",
+      // Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      Authorization:
+        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MWEzZGZmNWY3OTc2Zjk5N2VmNmJlMyIsImlhdCI6MTc0NzQwMTI1NH0.-iNM8ZB5Qg6hWxD-N-xC1r8bTZsvUt585MSImnPNW_w",
+    },
+  }),
   endpoints: (build) => ({
     getBlogById: build.mutation<{ status: number; blog: Blog }, { id: string }>(
       {
@@ -60,6 +68,18 @@ export const blogApi = createApi({
         };
       },
     }),
+    updateBlog: build.mutation<
+      { status: number },
+      { blog_id: string; content: string | undefined }
+    >({
+      query: (data) => {
+        return {
+          url: "/update/content",
+          method: "POST",
+          body: data,
+        };
+      },
+    }),
   }),
 });
 
@@ -68,4 +88,5 @@ export const {
   useSearchBlogsMutation,
   useGetLastestBlogsMutation,
   useGetBlogByIdMutation,
+  useUpdateBlogMutation,
 } = blogApi;
