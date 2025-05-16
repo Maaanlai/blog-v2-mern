@@ -16,7 +16,7 @@ import classes from "./header.module.css";
 import Logo from "./logo";
 import { useRouter } from "next/navigation";
 import { useGetMeQuery } from "../api/auth";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useAuth } from "@/providers/AuthProvider";
 
 const links = [

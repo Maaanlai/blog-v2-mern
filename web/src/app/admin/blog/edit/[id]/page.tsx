@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 import { useParams } from "next/navigation";
 import {
@@ -27,7 +28,7 @@ const tagTypes = [
   { value: "3", label: "Events" },
 ];
 
-function page() {
+function EditBlogPage() {
   const { id } = useParams<{ id: string }>();
   const [getBlogById, { data: blogData }] = useGetBlogByIdMutation();
   const [createBlog] = useCreateBlogMutation();
@@ -153,4 +154,4 @@ function page() {
   );
 }
 
-export default page;
+export default EditBlogPage;

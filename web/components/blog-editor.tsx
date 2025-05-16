@@ -11,6 +11,7 @@ import { useEffect } from "react";
 import CodeBlock from "@tiptap/extension-code-block";
 import { useUpdateBlogMutation } from "../api/blog";
 import { notifications } from "@mantine/notifications";
+// import { notifications } from "@mantine/notifications";
 
 function BlogEditor({ blogId, content }: { blogId: string; content: string }) {
   const editor = useEditor({
@@ -33,7 +34,7 @@ function BlogEditor({ blogId, content }: { blogId: string; content: string }) {
 
   useEffect(() => {
     editor?.commands.setContent(content);
-  }, [content]);
+  }, [content, editor]);
 
   return (
     <Stack>

@@ -14,6 +14,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useLoginMutation } from "../../../../api/auth";
 import { useAuth } from "@/providers/AuthProvider";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 function Login() {
   const router = useRouter();
@@ -30,7 +31,7 @@ function Login() {
     },
     validate: {
       email: isEmail("Invalid email address"),
-      password: (value: any) => {
+      password: (value: string) => {
         if (value.length < 6) {
           return "Password is too short";
         }

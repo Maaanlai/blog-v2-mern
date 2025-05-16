@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 import {
   ActionIcon,
@@ -62,6 +63,7 @@ function BlogPage() {
 
       notifications.show({ message: "Banner uploaded!", color: "green" });
     } catch (err) {
+      console.error("Upload failed", err);
       notifications.show({ message: "Upload failed", color: "red" });
     }
   };

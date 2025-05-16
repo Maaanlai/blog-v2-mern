@@ -27,11 +27,10 @@ export default function UserLayout({
       </head>
       <body>
         <MantineProvider theme={theme}>
-          <Notifications>
-            <AuthProvider>
-              <ReduxProvider>{children}</ReduxProvider>
-            </AuthProvider>
-          </Notifications>
+          <Notifications />
+          <AuthProvider>
+            <ReduxProvider>{children}</ReduxProvider>
+          </AuthProvider>
         </MantineProvider>
       </body>
     </html>

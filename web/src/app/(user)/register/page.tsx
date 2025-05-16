@@ -14,6 +14,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useRegisterMutation } from "../../../../api/auth";
 import { useAuth } from "@/providers/AuthProvider";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 function Register() {
   const router = useRouter();

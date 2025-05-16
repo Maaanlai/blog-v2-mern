@@ -10,7 +10,10 @@
   --mantine-breakpoint-lg: 1024px;
   --mantine-breakpoint-3xl: 1600px;
   --mantine-breakpoint-4xl: 1920px;
+  --sidebar-width-xl: 400px;
+  --sidebar-width-2xl: 288px;
 }
+
 
 @theme inline {
   --color-background: var(--background);

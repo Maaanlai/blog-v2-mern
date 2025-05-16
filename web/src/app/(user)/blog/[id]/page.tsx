@@ -14,7 +14,7 @@ import {
 } from "@mantine/core";
 import "./blog.css";
 
-function page() {
+function BlogList() {
   const [getBlogById, { data: blogData, isLoading }] = useGetBlogByIdMutation();
   const params = useParams<{ id: string }>();
 
@@ -45,7 +45,10 @@ function page() {
           {blogData?.blog?.title}
         </Text>
         <Group mt={8}>
-          <Avatar src={blogData?.blog.author.personal_info.profile_img} />
+          <Avatar
+            src={blogData?.blog.author.personal_info.profile_img}
+            alt="profile"
+          />
           <Text size="sm">{blogData?.blog.author.personal_info.fullName}</Text>
           <Text size="sm">
             {blogData?.blog.publishedAt &&
@@ -86,4 +89,4 @@ function page() {
   );
 }
 
-export default page;
+export default BlogList;
