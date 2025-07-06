@@ -5,13 +5,15 @@ import blogBanner from "./blog-banner.png"
 import blogBannerDark from "./blog-banner-dark.png"
 import PageNotFoundImageDark from "./404-dark.png"
 import PageNotFoundImageLight from "./404-light.png"
+import user from "./user.png"
 
 export {
 	logoDark,
 	logoLight,
 	googleIcon,
 	blogBanner,
-    blogBannerDark,
+	blogBannerDark,
 	PageNotFoundImageDark,
 	PageNotFoundImageLight,
+	user
 }

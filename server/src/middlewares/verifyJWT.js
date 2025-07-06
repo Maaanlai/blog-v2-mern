@@ -16,6 +16,7 @@ export const verifyJWT = (req, res, next) => {
     }
 
     jwt.verify(token, jwtTokenSecret, (error, user) => {
+        console.log(token);
         if (error) {
             return res.status(403).json({
                 status: 6001,
@@ -27,7 +28,7 @@ export const verifyJWT = (req, res, next) => {
         /** 
          * the user.id from the access token because the token sign time pass the user id
          *  */
-        req.user = user.id 
-        next() 
+        req.user = user.id
+        next()
     })
 }

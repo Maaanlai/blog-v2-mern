@@ -31,14 +31,14 @@ const generateUploadUrl = async () => {
 		Bucket: "ubcompliance-tokyo1",
 		Key: imageName,
 		ContentType: "image/jpeg",
-	  };
-  
+	};
+
 	const command = new PutObjectCommand(uploadParams);
-  
+
 	const signedUrl = await getSignedUrl(s3, command, { expiresIn: 3600 });
 	console.log(signedUrl)
 	return signedUrl;
-  };
+};
 
 
 export const getUploadUrl = async (req, res) => {
@@ -82,12 +82,12 @@ export const createBlog = async (req, res) => {
 			})
 		}
 
-		if (!banner) {
-			return res.status(403).json({
-				status: 6001,
-				message: "You must provide a banner to publish it",
-			})
-		}
+		// if (!banner) {
+		// 	return res.status(403).json({
+		// 		status: 6001,
+		// 		message: "You must provide a banner to publish it",
+		// 	})
+		// }
 
 		if (!content.blocks.length) {
 			return res.status(403).json({
@@ -505,31 +505,31 @@ export const deleteBlog = (req, res) => {
 }
 
 export const latestPodcast = async (req, res) => {
-    try {
-        const { page = 1, limit = 10 } = req.body;
-        const skipAmount = (page - 1) * limit;
+	try {
+		const { page = 1, limit = 10 } = req.body;
+		const skipAmount = (page - 1) * limit;
 
-        // Find blogs that have 'podcast' in their tags
-        const blogs = await Blog.find({ 
-            tags: { $in: ['podcast'] } 
-        })
-        .sort({ publishedAt: -1 })
-        .skip(skipAmount)
-        .limit(limit);
+		// Find blogs that have 'podcast' in their tags
+		const blogs = await Blog.find({
+			tags: { $in: ['podcast'] }
+		})
+			.sort({ publishedAt: -1 })
+			.skip(skipAmount)
+			.limit(limit);
 
-        if (!blogs.length) {
-            return res.status(404).json({ error: 'No podcast blogs found' });
-        }
+		if (!blogs.length) {
+			return res.status(404).json({ error: 'No podcast blogs found' });
+		}
 
-        return res.status(200).json({ 
-            blogs,
-            totalBlogs: await Blog.countDocuments({ tags: { $in: ['podcast'] } })
-        });
+		return res.status(200).json({
+			blogs,
+			totalBlogs: await Blog.countDocuments({ tags: { $in: ['podcast'] } })
+		});
 
-    } catch (error) {
-        console.error('Error in latestPodcast:', error);
-        return res.status(500).json({ 
-            error: 'Error while fetching podcast blogs' 
-        });
-    }
+	} catch (error) {
+		console.error('Error in latestPodcast:', error);
+		return res.status(500).json({
+			error: 'Error while fetching podcast blogs'
+		});
+	}
 }

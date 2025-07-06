@@ -6,6 +6,8 @@ import Quote from "@editorjs/quote"
 import Marker from "@editorjs/marker"
 import InlineCode from "@editorjs/inline-code"
 import LinkTool from '@editorjs/link';
+import Table from "editorjs-table"
+import YoutubeEmber from 'editorjs-youtube-embed'
 
 // functions
 import { uploadImage } from "../../functions/aws"
@@ -73,7 +75,25 @@ export const tools = {
     linkTool: {
         class: LinkTool,
         config: {
-          endpoint: '',
+            endpoint: '',
         }
-      }
+    },
+    table: {
+        class: Table,
+        inlineToolbar: true,
+        config: {
+            rows: 2,
+            cols: 3,
+            withHeadings: true,
+        },
+    },
+    youtubeEmbed: {
+        class: YoutubeEmber,
+        inlineToolbar: true,
+        config: {
+            service: 'youtube',
+            embedUrl: 'https://www.youtube.com/embed/',
+            placeholder: 'https://www.youtube.com/watch?v=VIDEO_ID',
+        },
+    },
 }

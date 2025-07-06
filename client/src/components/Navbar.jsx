@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useState } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import axios from "axios";
+import UserNavigationPanel from "./UserNavigationPanel";
 
 import { useStateContext } from "../contexts/GlobalContext";
 
@@ -8,9 +9,7 @@ import { useStateContext } from "../contexts/GlobalContext";
 import { setSession } from "../functions/session";
 
 // assets
-import { logoDark, logoLight } from "../assets";
-
-import UserNavigationPanel from "./UserNavigationPanel";
+import { logoDark, logoLight, user } from "../assets";
 
 const Navbar = () => {
   const [searchboxVisibility, setSearchBoxVisibility] = useState(false);
@@ -22,9 +21,10 @@ const Navbar = () => {
     userData,
     userData: { access_token, profile_img, new_notification_available },
     updateUserData,
-    // theme
     theme,
     setTheme,
+    adminData,
+    adminData: { admin_token },
   } = useStateContext();
 
   const changeTheme = () => {
@@ -57,11 +57,11 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    if (access_token) {
+    if (admin_token) {
       axios
         .get(`/api/v1/notifications/new`, {
           headers: {
-            Authorization: `Bearer ${access_token}`,
+            Authorization: `Bearer ${admin_token}`,
           },
         })
         .then(({ data }) => {
@@ -74,7 +74,7 @@ const Navbar = () => {
           console.log(error);
         });
     }
-  }, [access_token]);
+  }, [adminData]);
 
   return (
     <Fragment>
@@ -150,7 +150,7 @@ const Navbar = () => {
 					</Link> */}
 
           {/* change theme */}
-          <button
+          {/* <button
             className="w-12 h-12 rounded-full bg-grey relative hover:bg-black/20"
             onClick={changeTheme}
           >
@@ -161,48 +161,27 @@ const Navbar = () => {
                 " text-2xl block mt-1"
               }
             ></i>
-          </button>
+          </button> */}
 
-          {/* {access_token ? (
-						<>
-							<Link to="/dashboard/notifications">
-								<button className="w-12 h-12 rounded-full bg-grey relative hover:bg-black/20">
-									<i className="fi fi-rr-bell text-2xl block mt-1"></i>
-									{new_notification_available && (
-										<span className="bg-red w-3 h-3 rounded-full absolute z-10 top-2 right-2"></span>
-									)}
-								</button>
-							</Link>
+          {adminData.admin_token && adminData.admin_token !== null && (
+            <>
+              <div
+                className="relative"
+                onClick={handleUserNavPanel}
+                onBlur={handleBlur}
+              >
+                <button className="w-12 h-12 mt-1">
+                  <img
+                    className="w-full h-full object-cover rounded-full"
+                    src={user}
+                    alt="user"
+                  />
+                </button>
 
-							<div
-								className="relative"
-								onClick={handleUserNavPanel}
-								onBlur={handleBlur}
-							>
-								<button className="w-12 h-12 mt-1">
-									<img
-										className="w-full h-full object-cover rounded-full"
-										src={profile_img}
-										alt="user"
-									/>
-								</button>
-
-								{userNavPanel && <UserNavigationPanel />}
-							</div>
-						</>
-					) : (
-						<>
-							<Link to="/signin" className="btn-dark py-2">
-								Sign In
-							</Link>
-							<Link
-								to="/signup"
-								className="btn-light py-2 hidden md:block"
-							>
-								Sign Up
-							</Link>
-						</>
-					)} */}
+                {userNavPanel && <UserNavigationPanel />}
+              </div>
+            </>
+          )}
         </div>
       </nav>
 
