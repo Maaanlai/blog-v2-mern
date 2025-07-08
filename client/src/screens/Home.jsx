@@ -21,10 +21,10 @@ const Home = () => {
   const [blogs, setBlogs] = useState(null);
   const [trendingBlogs, setTrendingBlogs] = useState(null);
   const [pageState, setPageState] = useState("home");
+  const [totalDocs, setTotalDocs] = useState(0);
 
   const categories = [
     "finance",
-    "programming",
     "fraud",
     "new",
     "trading",
@@ -34,87 +34,136 @@ const Home = () => {
     "economy",
   ];
 
-  // Mock data for demonstration
-  const mockBlogs = [
-    {
-      blog_id: 1,
-      title: "The Future of Web Development",
-      des: "Exploring the latest trends and technologies that are shaping the future of web development, from AI integration to serverless architectures.",
-      author: {
-        personal_info: {
-          fullname: "John Doe",
-          profile_img:
-            "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-        },
-      },
-      publishedAt: "2024-01-15T10:30:00Z",
-      activity: { total_likes: 42, total_comments: 8 },
-      tags: ["programming", "web development", "technology"],
-    },
-    {
-      blog_id: 2,
-      title: "Understanding Modern Investment Strategies",
-      des: "A comprehensive guide to modern investment approaches, including diversification, risk management, and long-term wealth building strategies.",
-      author: {
-        personal_info: {
-          fullname: "Jane Smith",
-          profile_img:
-            "https://images.unsplash.com/photo-1494790108755-2616b2e6b8c7?w=150&h=150&fit=crop&crop=face",
-        },
-      },
-      publishedAt: "2024-01-12T14:20:00Z",
-      activity: { total_likes: 28, total_comments: 5 },
-      tags: ["finance", "investing", "wealth"],
-    },
-    {
-      blog_id: 3,
-      title: "Building Successful Business Models",
-      des: "Learn how to create and scale successful business models in today's competitive market landscape.",
-      author: {
-        personal_info: {
-          fullname: "Mike Johnson",
-          profile_img:
-            "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-        },
-      },
-      publishedAt: "2024-01-10T09:15:00Z",
-      activity: { total_likes: 35, total_comments: 12 },
-      tags: ["business", "entrepreneurship", "strategy"],
-    },
-  ];
+  // API base URL - adjust this to match your backend
+  const API_BASE_URL = "http://127.0.0.1:8080";
+  const BLOG_API_BASE = `${API_BASE_URL}/api/v1/blogs`;
 
-  const fetchLatestBlogs = ({ page = 1 }) => {
-    // Simulate API call
-    setTimeout(() => {
-      setBlogs({
-        results: mockBlogs,
-        page: page,
-        hasMore: page < 3,
+  const fetchLatestBlogs = async ({ page = 1 }) => {
+    try {
+      const response = await fetch(`${BLOG_API_BASE}/latest`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ page }),
       });
-    }, 500);
-  };
 
-  const fetchBlogsByCategory = ({ page = 1 }) => {
-    // Simulate API call with category filter
-    setTimeout(() => {
-      const filteredBlogs = mockBlogs.filter((blog) =>
-        blog.tags.some((tag) =>
-          tag.toLowerCase().includes(pageState.toLowerCase())
-        )
-      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch latest blogs");
+      }
+
+      const data = await response.json();
+
+      if (page === 1) {
+        setBlogs({
+          results: data.blogs || [],
+          page: page,
+          hasMore: data.blogs && data.blogs.length > 0,
+        });
+      } else {
+        setBlogs((prev) => ({
+          results: [...prev.results, ...(data.blogs || [])],
+          page: page,
+          hasMore: data.blogs && data.blogs.length > 0,
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching latest blogs:", error);
       setBlogs({
-        results: filteredBlogs,
-        page: page,
+        results: [],
+        page: 1,
         hasMore: false,
       });
-    }, 500);
+    }
   };
 
-  const fetchTrendingBlogs = () => {
-    // Simulate API call
-    setTimeout(() => {
-      setTrendingBlogs(mockBlogs.slice(0, 5));
-    }, 300);
+  const fetchBlogsByCategory = async ({ page = 1 }) => {
+    try {
+      const response = await fetch(`${BLOG_API_BASE}/search`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          tag: pageState,
+          page,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch blogs by category");
+      }
+
+      const data = await response.json();
+
+      if (page === 1) {
+        setBlogs({
+          results: data.blogs || [],
+          page: page,
+          hasMore: data.blogs && data.blogs.length > 0,
+        });
+      } else {
+        setBlogs((prev) => ({
+          results: [...prev.results, ...(data.blogs || [])],
+          page: page,
+          hasMore: data.blogs && data.blogs.length > 0,
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching blogs by category:", error);
+      setBlogs({
+        results: [],
+        page: 1,
+        hasMore: false,
+      });
+    }
+  };
+
+  const fetchTrendingBlogs = async () => {
+    try {
+      const response = await fetch(`${BLOG_API_BASE}/trending`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch trending blogs");
+      }
+
+      const data = await response.json();
+      setTrendingBlogs(data.blogs || []);
+    } catch (error) {
+      console.error("Error fetching trending blogs:", error);
+      setTrendingBlogs([]);
+    }
+  };
+
+  const fetchTotalPosts = async () => {
+    try {
+      const endpoint =
+        pageState === "home" ? "/latest/total-posts" : "/search/total-posts";
+      const body = pageState === "home" ? {} : { tag: pageState };
+
+      const response = await fetch(`${BLOG_API_BASE}${endpoint}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch total posts");
+      }
+
+      const data = await response.json();
+      setTotalDocs(data.totalDocs || 0);
+    } catch (error) {
+      console.error("Error fetching total posts:", error);
+      setTotalDocs(0);
+    }
   };
 
   const handleLoadCategory = (event) => {
@@ -141,7 +190,12 @@ const Home = () => {
     if (!trendingBlogs) {
       fetchTrendingBlogs();
     }
+
+    fetchTotalPosts();
   }, [pageState]);
+
+  // Calculate if there are more posts to load
+  const hasMorePosts = blogs && blogs.results.length < totalDocs;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -150,10 +204,11 @@ const Home = () => {
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="relative z-10 max-w-4xl mx-auto px-4 py-20 text-center">
           <h1 className="text-5xl md:text-6xl font-light tracking-wide mb-6">
-            Your Blog
+            UB Compliance
           </h1>
           <p className="text-xl md:text-2xl font-light opacity-90 mb-8">
-            Thoughts, stories and ideas
+            Securing your financial wellbeing with insights on finance,
+            business, and technology.
           </p>
           <div className="w-24 h-0.5 bg-white/60 mx-auto"></div>
         </div>
@@ -304,7 +359,7 @@ const Home = () => {
             )}
 
             {/* Load More Button */}
-            {blogs?.hasMore && (
+            {hasMorePosts && (
               <div className="mt-12 text-center">
                 <LoadMoreBtn
                   state={blogs}

@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import AnimationWrapper from "../components/common/AnimationWrapper.jsx";
 import Loader from "../components/common/Loader.jsx";
+import axios from "axios";
 
 const NodataMessage = ({ message }) => (
   <div className="text-center py-12">
@@ -13,6 +14,8 @@ const BlogMain = () => {
   const [trendingBlogs, setTrendingBlogs] = useState(null);
   const [pageState, setPageState] = useState("home");
   const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const observer = useRef();
 
   const categories = [
@@ -27,131 +30,119 @@ const BlogMain = () => {
     "economy",
   ];
 
-  // Mock data for demonstration
-  const mockBlogs = [
-    {
-      blog_id: 1,
-      title: "Advanced JavaScript Patterns for Modern Development",
-      des: "Dive deep into advanced JavaScript patterns and techniques that every modern developer should know. From closures to async patterns, we cover it all.",
-      author: {
-        personal_info: {
-          fullname: "Sarah Wilson",
-          profile_img:
-            "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
-        },
-      },
-      publishedAt: "2024-01-18T08:30:00Z",
-      activity: { total_likes: 67, total_comments: 15 },
-      tags: ["programming", "javascript", "development"],
-      banner:
-        "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&h=400&fit=crop",
-    },
-    {
-      blog_id: 2,
-      title: "Cryptocurrency Investment Strategies for 2024",
-      des: "Explore the latest cryptocurrency investment strategies and market analysis for the upcoming year. Learn how to navigate the volatile crypto market.",
-      author: {
-        personal_info: {
-          fullname: "David Chen",
-          profile_img:
-            "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-        },
-      },
-      publishedAt: "2024-01-16T14:45:00Z",
-      activity: { total_likes: 89, total_comments: 23 },
-      tags: ["finance", "cryptocurrency", "investing"],
-      banner:
-        "https://images.unsplash.com/photo-1518546305927-5a555bb7020d?w=800&h=400&fit=crop",
-    },
-    {
-      blog_id: 3,
-      title: "Building Scalable Business Models in the Digital Age",
-      des: "Learn how to create and scale successful business models that thrive in today's digital economy. From startups to enterprises.",
-      author: {
-        personal_info: {
-          fullname: "Emma Rodriguez",
-          profile_img:
-            "https://images.unsplash.com/photo-1494790108755-2616b2e6b8c7?w=150&h=150&fit=crop&crop=face",
-        },
-      },
-      publishedAt: "2024-01-14T11:20:00Z",
-      activity: { total_likes: 45, total_comments: 8 },
-      tags: ["business", "entrepreneurship", "digital"],
-      banner:
-        "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=400&fit=crop",
-    },
-    {
-      blog_id: 4,
-      title: "The Future of Web Development: Trends to Watch",
-      des: "Stay ahead of the curve with the latest web development trends and technologies shaping the future of the internet.",
-      author: {
-        personal_info: {
-          fullname: "Michael Thompson",
-          profile_img:
-            "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-        },
-      },
-      publishedAt: "2024-01-12T16:10:00Z",
-      activity: { total_likes: 52, total_comments: 11 },
-      tags: ["programming", "web development", "technology"],
-      banner:
-        "https://images.unsplash.com/photo-1547658719-da2b51169166?w=800&h=400&fit=crop",
-    },
-    {
-      blog_id: 5,
-      title: "Risk Management in Modern Investment Portfolios",
-      des: "Master the art of risk management in investment portfolios. Learn proven strategies to protect and grow your wealth.",
-      author: {
-        personal_info: {
-          fullname: "Lisa Park",
-          profile_img:
-            "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150&h=150&fit=crop&crop=face",
-        },
-      },
-      publishedAt: "2024-01-10T09:30:00Z",
-      activity: { total_likes: 38, total_comments: 6 },
-      tags: ["finance", "investing", "risk management"],
-      banner:
-        "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&h=400&fit=crop",
-    },
-  ];
+  const fetchLatestBlogs = async ({ page = 1 }) => {
+    try {
+      setIsLoading(true);
+      setError(null);
 
-  const fetchLatestBlogs = ({ page = 1 }) => {
-    setTimeout(() => {
-      setBlogs({
-        results: mockBlogs,
-        page: page,
-        hasMore: page < 2,
+      const response = await axios.post("/api/v1/blogs/latest", {
+        page,
+        ...(pageState !== "home" && { category: pageState }),
       });
-    }, 500);
+
+      if (response.data.status === 6000) {
+        setBlogs((prevBlogs) => ({
+          results:
+            page === 1
+              ? response.data.blogs
+              : [...(prevBlogs?.results || []), ...response.data.blogs],
+          page: page,
+          hasMore: response.data.blogs.length > 0,
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching latest blogs:", error);
+      setError("Failed to load articles. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const fetchTrendingBlogs = () => {
-    setTimeout(() => {
-      setTrendingBlogs(mockBlogs.slice(0, 3));
-    }, 300);
+  const fetchTrendingBlogs = async () => {
+    try {
+      const response = await axios.get("/api/v1/blogs/trending");
+      if (response.data.status === 6000) {
+        setTrendingBlogs(response.data.blogs);
+      }
+    } catch (error) {
+      console.error("Error fetching trending blogs:", error);
+    }
+  };
+
+  const searchBlogs = async (query, page = 1) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const response = await axios.post("/api/v1/blogs/search", {
+        query,
+        page,
+        ...(pageState !== "home" && { category: pageState }),
+      });
+
+      if (response.data.status === 6000) {
+        setBlogs((prevBlogs) => ({
+          results:
+            page === 1
+              ? response.data.blogs
+              : [...(prevBlogs?.results || []), ...response.data.blogs],
+          page: page,
+          hasMore: response.data.blogs.length > 0,
+        }));
+      }
+    } catch (error) {
+      console.error("Error searching blogs:", error);
+      setError("Failed to search articles. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      setBlogs(null);
+      searchBlogs(searchQuery.trim(), 1);
+    } else {
+      setBlogs(null);
+      fetchLatestBlogs({ page: 1 });
+    }
   };
 
   useEffect(() => {
     setBlogs(null);
     setError(null);
-    fetchLatestBlogs({ page: 1 });
-    if (!trendingBlogs) fetchTrendingBlogs();
+    setSearchQuery("");
+
+    if (pageState === "home" || categories.includes(pageState)) {
+      fetchLatestBlogs({ page: 1 });
+    }
+
+    if (!trendingBlogs) {
+      fetchTrendingBlogs();
+    }
   }, [pageState]);
 
   useEffect(() => {
-    if (!blogs?.hasMore) return;
+    if (!blogs?.hasMore || isLoading) return;
+
     observer.current = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) {
-        fetchLatestBlogs({ page: blogs.page + 1 });
+      if (entries[0].isIntersecting && !isLoading) {
+        if (searchQuery.trim()) {
+          searchBlogs(searchQuery.trim(), blogs.page + 1);
+        } else {
+          fetchLatestBlogs({ page: blogs.page + 1 });
+        }
       }
     });
+
     const loadMoreElement = document.getElementById("load-more");
     if (loadMoreElement) {
       observer.current.observe(loadMoreElement);
     }
+
     return () => observer.current?.disconnect();
-  }, [blogs]);
+  }, [blogs, isLoading, searchQuery]);
 
   const renderBlogCards = () => {
     return blogs.results.map((blog, index) => (
@@ -178,12 +169,12 @@ const BlogMain = () => {
             <div className="flex items-center gap-3 mb-4">
               <img
                 src={blog.author.personal_info.profile_img}
-                alt={blog.author.personal_info.fullname}
+                alt={blog.author.personal_info.fullName}
                 className="w-10 h-10 rounded-full object-cover"
               />
               <div>
                 <p className="text-sm font-medium text-gray-900">
-                  {blog.author.personal_info.fullname}
+                  {blog.author.personal_info.fullName}
                 </p>
                 <p className="text-xs text-gray-500">
                   {new Date(blog.publishedAt).toLocaleDateString("en-US", {
@@ -258,9 +249,35 @@ const BlogMain = () => {
           <h1 className="text-4xl md:text-5xl font-light tracking-wide mb-4">
             Latest Articles
           </h1>
-          <p className="text-lg md:text-xl font-light opacity-90">
+          <p className="text-lg md:text-xl font-light opacity-90 mb-8">
             Discover insights on technology, business, and finance
           </p>
+
+          {/* Search Bar */}
+          <form onSubmit={handleSearch} className="max-w-md mx-auto">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search articles..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full px-4 py-3 pl-12 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/30 focus:bg-white/20"
+              />
+              <svg
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            </div>
+          </form>
         </div>
       </div>
 
@@ -332,7 +349,7 @@ const BlogMain = () => {
                               {blog.title}
                             </h4>
                             <div className="flex items-center gap-2 text-xs text-gray-500">
-                              <span>{blog.author.personal_info.fullname}</span>
+                              <span>{blog.author.personal_info.fullName}</span>
                               <span>•</span>
                               <span>
                                 {new Date(
@@ -395,7 +412,12 @@ const BlogMain = () => {
                 <button
                   onClick={() => {
                     setError(null);
-                    fetchLatestBlogs({ page: 1 });
+                    setBlogs(null);
+                    if (searchQuery.trim()) {
+                      searchBlogs(searchQuery.trim(), 1);
+                    } else {
+                      fetchLatestBlogs({ page: 1 });
+                    }
                   }}
                   className="text-sm text-red-600 hover:text-red-800 underline"
                 >
@@ -407,10 +429,23 @@ const BlogMain = () => {
                 <Loader />
               </div>
             ) : blogs.results.length ? (
-              <div className="grid gap-8">{renderBlogCards()}</div>
+              <div className="grid gap-8">
+                {renderBlogCards()}
+                {isLoading && (
+                  <div className="flex justify-center py-8">
+                    <Loader />
+                  </div>
+                )}
+              </div>
             ) : (
               <div className="text-center py-12">
-                <NodataMessage message="No articles published yet" />
+                <NodataMessage
+                  message={
+                    searchQuery.trim()
+                      ? `No articles found for "${searchQuery}"`
+                      : "No articles published yet"
+                  }
+                />
               </div>
             )}
 
