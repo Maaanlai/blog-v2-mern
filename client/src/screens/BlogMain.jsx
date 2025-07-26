@@ -16,6 +16,8 @@ const BlogMain = () => {
   const [trendingBlogs, setTrendingBlogs] = useState(null);
   const [pageState, setPageState] = useState("home");
   const [error, setError] = useState(null);
+  const [email, setEmail] = useState("");
+  const [subscriptionStatus, setSubscriptionStatus] = useState(null);
   const observer = useRef();
 
   const categories = [
@@ -98,6 +100,43 @@ const BlogMain = () => {
       });
   }, []);
 
+  const handleNewsletterSubscription = async (e) => {
+    e.preventDefault();
+    if (!email) {
+      setSubscriptionStatus({
+        type: "error",
+        message: "Please enter your email address",
+      });
+      return;
+    }
+
+    try {
+      setSubscriptionStatus({ type: "loading", message: "Subscribing..." });
+
+      const response = await axios.post(`/api/v1/newsletter/subscribe`, {
+        email,
+      });
+
+      if (response.data.status === 6000) {
+        setSubscriptionStatus({
+          type: "success",
+          message: "Successfully subscribed!",
+        });
+        setEmail(""); // Clear the email input
+      }
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message ||
+        "Failed to subscribe. Please try again.";
+      setSubscriptionStatus({ type: "error", message: errorMessage });
+    }
+
+    // Clear status after 3 seconds
+    setTimeout(() => {
+      setSubscriptionStatus(null);
+    }, 3000);
+  };
+
   useEffect(() => {
     setBlogs(null);
     setError(null);
@@ -156,15 +195,7 @@ const BlogMain = () => {
 
             <div className="p-6">
               <div className="flex items-center gap-3 mb-4">
-                <img
-                  src={blog.author.personal_info.profile_img}
-                  alt={blog.author.personal_info.fullname}
-                  className="w-10 h-10 rounded-full object-cover"
-                />
-                <div>
-                  <p className="text-sm font-medium text-gray-900">
-                    {blog.author.personal_info.fullname}
-                  </p>
+                <div className="text-align-right">
                   <p className="text-xs text-gray-500">
                     {new Date(blog.publishedAt).toLocaleDateString("en-US", {
                       year: "numeric",
@@ -305,10 +336,7 @@ const BlogMain = () => {
                       >
                         <div className="flex gap-3">
                           <img
-                            src={
-                              blog.banner ||
-                              `https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=100&h=100&fit=crop`
-                            }
+                            src={blog.banner}
                             alt={blog.title}
                             className="w-16 h-16 rounded-lg object-cover"
                           />
@@ -343,16 +371,43 @@ const BlogMain = () => {
                 <p className="text-sm text-gray-300 mb-4">
                   Get the latest articles delivered to your inbox
                 </p>
-                <div className="flex flex-col gap-2">
+                <form
+                  onSubmit={handleNewsletterSubscription}
+                  className="flex flex-col gap-2"
+                >
                   <input
                     type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     placeholder="Your email address"
                     className="px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/30"
+                    disabled={subscriptionStatus?.type === "loading"}
                   />
-                  <button className="px-4 py-2 bg-white text-gray-900 rounded-lg hover:bg-gray-100 transition-colors duration-200 text-sm font-medium">
-                    Subscribe
+                  <button
+                    type="submit"
+                    disabled={subscriptionStatus?.type === "loading"}
+                    className="px-4 py-2 bg-white text-gray-900 rounded-lg hover:bg-gray-100 transition-colors duration-200 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {subscriptionStatus?.type === "loading"
+                      ? "Subscribing..."
+                      : "Subscribe"}
                   </button>
-                </div>
+                </form>
+
+                {/* Status Message */}
+                {subscriptionStatus && (
+                  <div
+                    className={`mt-3 text-sm ${
+                      subscriptionStatus.type === "success"
+                        ? "text-green-300"
+                        : subscriptionStatus.type === "error"
+                        ? "text-red-300"
+                        : "text-gray-300"
+                    }`}
+                  >
+                    {subscriptionStatus.message}
+                  </div>
+                )}
               </div>
             </div>
           </aside>

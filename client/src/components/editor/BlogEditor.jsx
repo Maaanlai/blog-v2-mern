@@ -57,7 +57,7 @@ const BlogEditor = ({ setEditorState }) => {
 
     if (img) {
       const loadingToast = toast.loading("Uploading...");
-      uploadImage(img, access_token)
+      uploadImage(img, admin_token)
         .then((url) => {
           if (url) {
             toast.dismiss(loadingToast);

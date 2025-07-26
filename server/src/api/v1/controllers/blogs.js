@@ -9,6 +9,9 @@ import User from "../../../models/User.js"
 import Notification from "../../../models/Notification.js"
 import Comment from "../../../models/Comment.js"
 
+// configs
+import { serverConfig } from "../../../configs/index.js"
+
 // Configure multer for file uploads
 const storage = multer.diskStorage({
 	destination: (req, file, cb) => {
@@ -53,8 +56,8 @@ export const uploadFile = async (req, res) => {
 			});
 		}
 
-		// Generate the URL for the uploaded file
-		const fileUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+		// Generate the URL for the uploaded file - use relative path for proxy
+		const fileUrl = `/uploads/${req.file.filename}`;
 
 		res.status(200).json({
 			status: 6000,
@@ -264,7 +267,7 @@ export const trendingBlogs = async (req, res) => {
 			"activity.total_likes": -1,
 			publishedAt: -1,
 		})
-		.select("blog_id title publishedAt -_id")
+		.select("blog_id title publishedAt -_id banner")
 		.limit(5)
 		.then((blogs) => {
 			return res.status(200).json({

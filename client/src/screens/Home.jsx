@@ -24,6 +24,8 @@ const Home = () => {
   const [blogs, setBlogs] = useState(null);
   const [trendingBlogs, setTrendingBlogs] = useState(null);
   const [pageState, setPageState] = useState("home");
+  const [email, setEmail] = useState("");
+  const [subscriptionStatus, setSubscriptionStatus] = useState(null);
 
   const categories = [
     "finance",
@@ -103,6 +105,43 @@ const Home = () => {
       });
   }, []);
 
+  const handleNewsletterSubscription = async (e) => {
+    e.preventDefault();
+    if (!email) {
+      setSubscriptionStatus({
+        type: "error",
+        message: "Please enter your email address",
+      });
+      return;
+    }
+
+    try {
+      setSubscriptionStatus({ type: "loading", message: "Subscribing..." });
+
+      const response = await axios.post(`/api/v1/newsletter/subscribe`, {
+        email,
+      });
+
+      if (response.data.status === 6000) {
+        setSubscriptionStatus({
+          type: "success",
+          message: "Successfully subscribed!",
+        });
+        setEmail(""); // Clear the email input
+      }
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message ||
+        "Failed to subscribe. Please try again.";
+      setSubscriptionStatus({ type: "error", message: errorMessage });
+    }
+
+    // Clear status after 3 seconds
+    setTimeout(() => {
+      setSubscriptionStatus(null);
+    }, 3000);
+  };
+
   const handleLoadCategory = (event) => {
     const category = event.target.innerText.toLowerCase();
     setBlogs(null);
@@ -138,7 +177,7 @@ const Home = () => {
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="relative z-10 max-w-4xl mx-auto px-4 py-20 text-center">
           <h1 className="text-5xl md:text-6xl font-light tracking-wide mb-6">
-            Your Blog
+            UBCompliance
           </h1>
           <p className="text-xl md:text-2xl font-light opacity-90 mb-8">
             Thoughts, stories and ideas
@@ -200,14 +239,6 @@ const Home = () => {
                     <article className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden">
                       <div className="p-8">
                         <div className="flex items-center gap-3 mb-4">
-                          <img
-                            src={
-                              blog?.author?.personal_info?.profile_img ||
-                              "/default-avatar.png"
-                            }
-                            alt={blog?.author?.personal_info?.fullname}
-                            className="w-10 h-10 rounded-full object-cover"
-                          />
                           <div>
                             <p className="text-sm font-medium text-gray-900">
                               {blog?.author?.personal_info?.fullname}
