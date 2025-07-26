@@ -14,7 +14,7 @@ import AnimationWrapper from "../common/AnimationWrapper";
 import { tools } from "./EditorTools";
 
 // functions
-import { uploadImage } from "../../functions/aws";
+import { uploadImage } from "../../functions/upload";
 
 // assets
 import { logoDark, logoLight, blogBanner, blogBannerDark } from "../../assets";

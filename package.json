@@ -23,6 +23,7 @@
 		"fs": "^0.0.1-security",
 		"jsonwebtoken": "^9.0.2",
 		"mongoose": "^8.0.0",
+		"multer": "^2.0.2",
 		"nanoid": "^5.0.2"
 	},
 	"devDependencies": {

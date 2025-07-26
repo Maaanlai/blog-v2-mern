@@ -1,6 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import axios from "axios";
+import { Link } from "react-router-dom";
 import AnimationWrapper from "../components/common/AnimationWrapper.jsx";
 import Loader from "../components/common/Loader.jsx";
+import { filterPaginationData } from "../functions/paginationData.js";
 
 const NodataMessage = ({ message }) => (
   <div className="text-center py-12">
@@ -34,88 +37,71 @@ const Home = () => {
     "economy",
   ];
 
-  // Mock data for demonstration
-  const mockBlogs = [
-    {
-      blog_id: 1,
-      title: "The Future of Web Development",
-      des: "Exploring the latest trends and technologies that are shaping the future of web development, from AI integration to serverless architectures.",
-      author: {
-        personal_info: {
-          fullname: "John Doe",
-          profile_img:
-            "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-        },
-      },
-      publishedAt: "2024-01-15T10:30:00Z",
-      activity: { total_likes: 42, total_comments: 8 },
-      tags: ["programming", "web development", "technology"],
-    },
-    {
-      blog_id: 2,
-      title: "Understanding Modern Investment Strategies",
-      des: "A comprehensive guide to modern investment approaches, including diversification, risk management, and long-term wealth building strategies.",
-      author: {
-        personal_info: {
-          fullname: "Jane Smith",
-          profile_img:
-            "https://images.unsplash.com/photo-1494790108755-2616b2e6b8c7?w=150&h=150&fit=crop&crop=face",
-        },
-      },
-      publishedAt: "2024-01-12T14:20:00Z",
-      activity: { total_likes: 28, total_comments: 5 },
-      tags: ["finance", "investing", "wealth"],
-    },
-    {
-      blog_id: 3,
-      title: "Building Successful Business Models",
-      des: "Learn how to create and scale successful business models in today's competitive market landscape.",
-      author: {
-        personal_info: {
-          fullname: "Mike Johnson",
-          profile_img:
-            "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-        },
-      },
-      publishedAt: "2024-01-10T09:15:00Z",
-      activity: { total_likes: 35, total_comments: 12 },
-      tags: ["business", "entrepreneurship", "strategy"],
-    },
-  ];
+  const fetchLatestBlogs = useCallback(({ page = 1 }) => {
+    setBlogs((currentBlogs) => {
+      axios
+        .post(`/api/v1/blogs/latest`, { page })
+        .then(async ({ data }) => {
+          const formattedData = await filterPaginationData({
+            state: currentBlogs,
+            data: data?.blogs,
+            page,
+            countRoute: "blogs/latest/total-posts",
+          });
 
-  const fetchLatestBlogs = ({ page = 1 }) => {
-    // Simulate API call
-    setTimeout(() => {
-      setBlogs({
-        results: mockBlogs,
-        page: page,
-        hasMore: page < 3,
+          // Calculate if there are more pages
+          const hasMore =
+            formattedData.results.length < formattedData.totalDocs;
+          setBlogs({ ...formattedData, hasMore });
+        })
+        .catch((error) => {
+          console.log("Error fetching latest blogs:", error);
+        });
+      return currentBlogs;
+    });
+  }, []);
+
+  const fetchBlogsByCategory = useCallback(
+    ({ page = 1 }) => {
+      setBlogs((currentBlogs) => {
+        axios
+          .post(`/api/v1/blogs/search`, {
+            tag: pageState,
+            page,
+          })
+          .then(async ({ data }) => {
+            const formattedData = await filterPaginationData({
+              state: currentBlogs,
+              data: data?.blogs,
+              page,
+              countRoute: "blogs/search/total-posts",
+              dataToSend: { tag: pageState },
+            });
+
+            // Calculate if there are more pages
+            const hasMore =
+              formattedData.results.length < formattedData.totalDocs;
+            setBlogs({ ...formattedData, hasMore });
+          })
+          .catch((error) => {
+            console.log("Error fetching blogs by category:", error);
+          });
+        return currentBlogs;
       });
-    }, 500);
-  };
+    },
+    [pageState]
+  );
 
-  const fetchBlogsByCategory = ({ page = 1 }) => {
-    // Simulate API call with category filter
-    setTimeout(() => {
-      const filteredBlogs = mockBlogs.filter((blog) =>
-        blog.tags.some((tag) =>
-          tag.toLowerCase().includes(pageState.toLowerCase())
-        )
-      );
-      setBlogs({
-        results: filteredBlogs,
-        page: page,
-        hasMore: false,
+  const fetchTrendingBlogs = useCallback(() => {
+    axios
+      .get(`/api/v1/blogs/trending`)
+      .then(({ data }) => {
+        setTrendingBlogs(data?.blogs);
+      })
+      .catch((error) => {
+        console.log("Error fetching trending blogs:", error);
       });
-    }, 500);
-  };
-
-  const fetchTrendingBlogs = () => {
-    // Simulate API call
-    setTimeout(() => {
-      setTrendingBlogs(mockBlogs.slice(0, 5));
-    }, 300);
-  };
+  }, []);
 
   const handleLoadCategory = (event) => {
     const category = event.target.innerText.toLowerCase();
@@ -137,11 +123,13 @@ const Home = () => {
     } else {
       fetchBlogsByCategory({ page: 1 });
     }
+  }, [pageState, fetchLatestBlogs, fetchBlogsByCategory]);
 
+  useEffect(() => {
     if (!trendingBlogs) {
       fetchTrendingBlogs();
     }
-  }, [pageState]);
+  }, [fetchTrendingBlogs, trendingBlogs]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -237,9 +225,11 @@ const Home = () => {
                           </div>
                         </div>
 
-                        <h2 className="text-2xl font-light text-gray-900 mb-4 leading-tight hover:text-gray-700 cursor-pointer">
-                          {blog?.title}
-                        </h2>
+                        <Link to={`/blog/${blog?.blog_id}`}>
+                          <h2 className="text-2xl font-light text-gray-900 mb-4 leading-tight hover:text-gray-700 cursor-pointer">
+                            {blog?.title}
+                          </h2>
+                        </Link>
 
                         <p className="text-gray-600 leading-relaxed mb-6 line-clamp-3">
                           {blog?.des}
@@ -351,7 +341,10 @@ const Home = () => {
                           delay: index * 0.1,
                         }}
                       >
-                        <div className="group cursor-pointer">
+                        <Link
+                          to={`/blog/${blog?.blog_id}`}
+                          className="group cursor-pointer"
+                        >
                           <h4 className="text-sm font-medium text-gray-900 group-hover:text-gray-600 transition-colors duration-200 line-clamp-2 mb-2">
                             {blog?.title}
                           </h4>
@@ -362,7 +355,7 @@ const Home = () => {
                               {new Date(blog?.publishedAt).toLocaleDateString()}
                             </span>
                           </div>
-                        </div>
+                        </Link>
                       </AnimationWrapper>
                     ))}
                   </div>

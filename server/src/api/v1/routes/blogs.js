@@ -4,6 +4,8 @@ import express from "express"
 import { verifyJWT } from "../../../middlewares/index.js"
 import {
     getUploadUrl,
+    uploadFile,
+    uploadImage,
     createBlog,
     latestBlogs,
     trendingBlogs,
@@ -19,7 +21,9 @@ import {
 
 const router = express.Router()
 
-router.get("/get-upload-url", verifyJWT, getUploadUrl)
+// File upload routes
+router.post("/upload-file", verifyJWT, uploadImage, uploadFile)
+router.get("/get-upload-url", verifyJWT, getUploadUrl) // Legacy route for compatibility
 router.post("/create", verifyJWT, createBlog)
 
 router.post("/search", searchBlogs)
