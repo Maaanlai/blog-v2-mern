@@ -9,11 +9,12 @@ import { useStateContext } from "../contexts/GlobalContext";
 import { setSession } from "../functions/session";
 
 // assets
-import { logoDark, logoLight, user } from "../assets";
+import { user, logo } from "../assets";
 
 const Navbar = () => {
   const [searchboxVisibility, setSearchBoxVisibility] = useState(false);
   const [userNavPanel, setUserNavPanel] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navigate = useNavigate();
 
@@ -40,8 +41,17 @@ const Navbar = () => {
   const handleUserNavPanel = () => {
     setUserNavPanel((current) => !current);
   };
+
   const handleBlur = () => {
     setTimeout(() => setUserNavPanel(false), 200);
+  };
+
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen((current) => !current);
+  };
+
+  const closeMobileMenu = () => {
+    setMobileMenuOpen(false);
   };
 
   // search
@@ -78,15 +88,16 @@ const Navbar = () => {
 
   return (
     <Fragment>
-      <nav className="navbar z-50">
+      <nav className="navbar z-50 relative">
         <Link to="/" className="flex-none w-10">
           <img
-            src={theme == "light" ? logoDark : logoLight}
+            src={theme == "light" ? logo : logo}
             alt="logo"
             className="w-full"
           />
         </Link>
 
+        {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-8 ml-8">
           <Link
             to="/blog-main"
@@ -101,18 +112,6 @@ const Navbar = () => {
             Бүтээгдэхүүн үйлчилгээ
           </Link>
           <Link
-            to="/course"
-            className="text-dark-grey hover:text-black dark:hover:text-white transition-colors"
-          >
-            Сургалт материал
-          </Link>
-          <Link
-            to="/podcast"
-            className="text-dark-grey hover:text-black dark:hover:text-white transition-colors"
-          >
-            Подкаст
-          </Link>
-          <Link
             to="/about"
             className="text-dark-grey hover:text-black dark:hover:text-white transition-colors"
           >
@@ -120,51 +119,10 @@ const Navbar = () => {
           </Link>
         </div>
 
-        {/* <div
-					className={
-						"absolute bg-white w-full left-0 top-full mt-0.5 border-b border-grey py-4 px-[5vw] md:border-0 md:block md:relative md:inset-0 md:p-0 md:w-auto md:show " +
-						(searchboxVisibility ? "sow" : "hide")
-					}
-				>
-					<input
-						type="text"
-						name=""
-						placeholder="Search"
-						className="w-full md:w-auto bg-grey p-4 pl-6 pr-[12%] md:pr-6 rounded-full placeholder:text-dark-grey md:pl-12"
-						onKeyDown={handleSearch}
-					/>
-
-					<i className="fi fi-rr-search absolute right-[10%] md:pointer-events-none md:left-5 top-1/2 -translate-y-1/2 text-xl text-dark-grey"></i>
-				</div> */}
-
-        <div className="flex items-right gap-3 md:gap-6 ml-auto">
-          <button
-            className="md:hidden bg-grey w-12 h-12 rounded-full flex items-center justify-center"
-            onClick={() => setSearchBoxVisibility((current) => !current)}
-          >
-            <i className="fi fi-rr-search text-xl"></i>
-          </button>
-          {/* <Link to="/editor" className="hidden md:flex gap-2 link">
-						<i className="fi fi-rr-file-edit"></i>
-						<p>Write</p>
-					</Link> */}
-
-          {/* change theme */}
-          {/* <button
-            className="w-12 h-12 rounded-full bg-grey relative hover:bg-black/20"
-            onClick={changeTheme}
-          >
-            <i
-              className={
-                "fi fi-rr-" +
-                (theme == "light" ? "moon-stars" : "sun") +
-                " text-2xl block mt-1"
-              }
-            ></i>
-          </button> */}
-
+        <div className="flex items-center gap-3 md:gap-6 ml-auto">
+          {/* Desktop User Navigation */}
           {adminData.admin_token && adminData.admin_token !== null && (
-            <>
+            <div className="hidden md:block">
               <div
                 className="relative"
                 onClick={handleUserNavPanel}
@@ -180,9 +138,87 @@ const Navbar = () => {
 
                 {userNavPanel && <UserNavigationPanel />}
               </div>
-            </>
+            </div>
           )}
+
+          {/* Hamburger Menu Button */}
+          <button onClick={toggleMobileMenu} aria-label="Toggle mobile menu">
+            <div className="flex flex-col justify-center items-center space-y-1">
+              <span
+                className={`block w-5 h-0.5 bg-black dark:bg-white transition-all duration-300 ${
+                  mobileMenuOpen ? "rotate-45 translate-y-1.5" : ""
+                }`}
+              ></span>
+              <span
+                className={`block w-5 h-0.5 bg-black dark:bg-white transition-all duration-300 ${
+                  mobileMenuOpen ? "opacity-0" : ""
+                }`}
+              ></span>
+              <span
+                className={`block w-5 h-0.5 bg-black dark:bg-white transition-all duration-300 ${
+                  mobileMenuOpen ? "-rotate-45 -translate-y-1.5" : ""
+                }`}
+              ></span>
+            </div>
+          </button>
         </div>
+
+        {/* Mobile Navigation Menu */}
+        <div
+          className={`absolute top-full left-0 w-full bg-white dark:bg-black border-b border-grey md:hidden transition-all duration-300 ${
+            mobileMenuOpen
+              ? "opacity-100 visible translate-y-0"
+              : "opacity-0 invisible -translate-y-2"
+          }`}
+        >
+          <div className="px-6 py-4 space-y-4">
+            <Link
+              to="/blog-main"
+              className="block text-dark-grey hover:text-black dark:hover:text-white transition-colors py-2"
+              onClick={closeMobileMenu}
+            >
+              Нийтлэл мэдээлэл
+            </Link>
+            <Link
+              to="/products"
+              className="block text-dark-grey hover:text-black dark:hover:text-white transition-colors py-2"
+              onClick={closeMobileMenu}
+            >
+              Бүтээгдэхүүн үйлчилгээ
+            </Link>
+            <Link
+              to="/about"
+              className="block text-dark-grey hover:text-black dark:hover:text-white transition-colors py-2"
+              onClick={closeMobileMenu}
+            >
+              Бидний тухай
+            </Link>
+
+            {/* Mobile User Navigation */}
+            {adminData.admin_token && adminData.admin_token !== null && (
+              <div className="pt-4 border-t border-grey">
+                <div className="flex items-center gap-3">
+                  <img
+                    className="w-10 h-10 object-cover rounded-full"
+                    src={user}
+                    alt="user"
+                  />
+                  <span className="text-dark-grey dark:text-white">
+                    Admin Panel
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Overlay to close mobile menu when clicking outside */}
+        {mobileMenuOpen && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+            onClick={closeMobileMenu}
+          ></div>
+        )}
       </nav>
 
       <Outlet />

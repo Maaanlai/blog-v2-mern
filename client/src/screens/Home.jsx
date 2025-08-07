@@ -29,7 +29,6 @@ const Home = () => {
 
   const categories = [
     "finance",
-    "programming",
     "fraud",
     "new",
     "trading",
@@ -347,8 +346,8 @@ const Home = () => {
                 <h3 className="text-lg font-light text-gray-900 mb-4">About</h3>
                 <p className="text-gray-600 text-sm leading-relaxed">
                   Welcome to our blog where we share insights about finance,
-                  programming, business, and technology. Stay tuned for the
-                  latest updates and trends.
+                  business, and technology. Stay tuned for the latest updates
+                  and trends.
                 </p>
               </div>
 

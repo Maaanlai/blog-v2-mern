@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { user } from "../assets";
 
 const AboutUs = () => {
   const [faqOpen, setFaqOpen] = useState(null);
@@ -71,7 +72,7 @@ const AboutUs = () => {
               className="bg-white shadow-lg rounded-lg p-6 text-center"
             >
               <img
-                src="https://via.placeholder.com/150"
+                src={user}
                 alt="Profile"
                 className="w-24 h-24 rounded-full mx-auto"
               />

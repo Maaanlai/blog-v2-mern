@@ -22,7 +22,6 @@ const BlogMain = () => {
 
   const categories = [
     "finance",
-    "programming",
     "fraud",
     "new",
     "trading",
