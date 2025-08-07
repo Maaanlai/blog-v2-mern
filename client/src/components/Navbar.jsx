@@ -1,42 +1,24 @@
 import { Fragment, useEffect, useState } from "react";
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import axios from "axios";
 import UserNavigationPanel from "./UserNavigationPanel";
 
 import { useStateContext } from "../contexts/GlobalContext";
 
-// functions
-import { setSession } from "../functions/session";
-
 // assets
 import { user, logo } from "../assets";
 
 const Navbar = () => {
-  const [searchboxVisibility, setSearchBoxVisibility] = useState(false);
   const [userNavPanel, setUserNavPanel] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const navigate = useNavigate();
-
   const {
     userData,
-    userData: { access_token, profile_img, new_notification_available },
     updateUserData,
     theme,
-    setTheme,
     adminData,
     adminData: { admin_token },
   } = useStateContext();
-
-  const changeTheme = () => {
-    let newTheme = theme == "light" ? "dark" : "light";
-
-    setTheme(newTheme);
-
-    document.body.setAttribute("data-theme", newTheme);
-
-    setSession("theme", newTheme);
-  };
 
   const handleUserNavPanel = () => {
     setUserNavPanel((current) => !current);
@@ -52,18 +34,6 @@ const Navbar = () => {
 
   const closeMobileMenu = () => {
     setMobileMenuOpen(false);
-  };
-
-  // search
-  const handleSearch = (event) => {
-    const query = event.target.value;
-
-    console.log(event);
-
-    if (event.keyCode === 13 && query.length) {
-      navigate(`/search/${query}`);
-      console.log("hello");
-    }
   };
 
   useEffect(() => {
@@ -84,7 +54,7 @@ const Navbar = () => {
           console.log(error);
         });
     }
-  }, [adminData]);
+  }, [adminData, admin_token, updateUserData, userData]);
 
   return (
     <Fragment>
@@ -142,24 +112,42 @@ const Navbar = () => {
           )}
 
           {/* Hamburger Menu Button */}
-          <button onClick={toggleMobileMenu} aria-label="Toggle mobile menu">
-            <div className="flex flex-col justify-center items-center space-y-1">
-              <span
-                className={`block w-5 h-0.5 bg-black dark:bg-white transition-all duration-300 ${
-                  mobileMenuOpen ? "rotate-45 translate-y-1.5" : ""
-                }`}
-              ></span>
-              <span
-                className={`block w-5 h-0.5 bg-black dark:bg-white transition-all duration-300 ${
-                  mobileMenuOpen ? "opacity-0" : ""
-                }`}
-              ></span>
-              <span
-                className={`block w-5 h-0.5 bg-black dark:bg-white transition-all duration-300 ${
-                  mobileMenuOpen ? "-rotate-45 -translate-y-1.5" : ""
-                }`}
-              ></span>
-            </div>
+          <button
+            onClick={toggleMobileMenu}
+            aria-label="Toggle mobile menu"
+            className="md:hidden bg-grey w-12 h-12 rounded-full flex items-center justify-center hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
+          >
+            {mobileMenuOpen ? (
+              <svg
+                className="w-6 h-6 text-black dark:text-white"
+                fill="none"
+                stroke="black"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            ) : (
+              <svg
+                className="w-6 h-6 text-black dark:text-white"
+                fill="none"
+                stroke="black"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            )}
           </button>
         </div>
 
