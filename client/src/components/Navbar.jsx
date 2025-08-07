@@ -152,53 +152,49 @@ const Navbar = () => {
         </div>
 
         {/* Mobile Navigation Menu */}
-        <div
-          className={`absolute top-full left-0 w-full bg-white dark:bg-black border-b border-grey md:hidden transition-all duration-300 ${
-            mobileMenuOpen
-              ? "opacity-100 visible translate-y-0"
-              : "opacity-0 invisible -translate-y-2"
-          }`}
-        >
-          <div className="px-6 py-4 space-y-4">
-            <Link
-              to="/blog-main"
-              className="block text-dark-grey hover:text-black dark:hover:text-white transition-colors py-2"
-              onClick={closeMobileMenu}
-            >
-              Нийтлэл мэдээлэл
-            </Link>
-            <Link
-              to="/products"
-              className="block text-dark-grey hover:text-black dark:hover:text-white transition-colors py-2"
-              onClick={closeMobileMenu}
-            >
-              Бүтээгдэхүүн үйлчилгээ
-            </Link>
-            <Link
-              to="/about"
-              className="block text-dark-grey hover:text-black dark:hover:text-white transition-colors py-2"
-              onClick={closeMobileMenu}
-            >
-              Бидний тухай
-            </Link>
+        {mobileMenuOpen && (
+          <div className="absolute top-full left-0 w-full bg-white dark:bg-black border-b border-grey md:hidden z-50 shadow-lg">
+            <div className="px-6 py-4 space-y-2">
+              <Link
+                to="/blog-main"
+                className="block text-dark-grey hover:text-black dark:hover:text-white transition-colors py-3 border-b border-grey/20"
+                onClick={closeMobileMenu}
+              >
+                Нийтлэл мэдээлэл
+              </Link>
+              <Link
+                to="/products"
+                className="block text-dark-grey hover:text-black dark:hover:text-white transition-colors py-3 border-b border-grey/20"
+                onClick={closeMobileMenu}
+              >
+                Бүтээгдэхүүн үйлчилгээ
+              </Link>
+              <Link
+                to="/about"
+                className="block text-dark-grey hover:text-black dark:hover:text-white transition-colors py-3"
+                onClick={closeMobileMenu}
+              >
+                Бидний тухай
+              </Link>
 
-            {/* Mobile User Navigation */}
-            {adminData.admin_token && adminData.admin_token !== null && (
-              <div className="pt-4 border-t border-grey">
-                <div className="flex items-center gap-3">
-                  <img
-                    className="w-10 h-10 object-cover rounded-full"
-                    src={user}
-                    alt="user"
-                  />
-                  <span className="text-dark-grey dark:text-white">
-                    Admin Panel
-                  </span>
+              {/* Mobile User Navigation */}
+              {adminData.admin_token && adminData.admin_token !== null && (
+                <div className="pt-4 border-t border-grey">
+                  <div className="flex items-center gap-3 py-2">
+                    <img
+                      className="w-10 h-10 object-cover rounded-full"
+                      src={user}
+                      alt="user"
+                    />
+                    <span className="text-dark-grey dark:text-white">
+                      Admin Panel
+                    </span>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Overlay to close mobile menu when clicking outside */}
         {mobileMenuOpen && (
