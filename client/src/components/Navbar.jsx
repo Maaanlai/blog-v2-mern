@@ -2,6 +2,7 @@ import { Fragment, useEffect, useState } from "react";
 import { Link, Outlet } from "react-router-dom";
 import axios from "axios";
 import UserNavigationPanel from "./UserNavigationPanel";
+import Footer from "./Footer";
 
 import { useStateContext } from "../contexts/GlobalContext";
 
@@ -218,6 +219,7 @@ const Navbar = () => {
       </nav>
 
       <Outlet />
+      <Footer />
     </Fragment>
   );
 };
