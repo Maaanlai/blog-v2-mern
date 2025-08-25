@@ -81,6 +81,12 @@ const Navbar = () => {
           >
             Бүтээгдэхүүн үйлчилгээ
           </Link>
+                    <Link
+            to="/podcast"
+            className="text-dark-grey hover:text-black dark:hover:text-white transition-colors"
+          >
+            Podcast
+          </Link>
           <Link
             to="/about"
             className="text-dark-grey hover:text-black dark:hover:text-white transition-colors"
@@ -168,6 +174,12 @@ const Navbar = () => {
                 onClick={closeMobileMenu}
               >
                 Бүтээгдэхүүн үйлчилгээ
+              </Link>
+              <Link
+                to="/podcast"
+                className="text-dark-grey hover:text-black dark:hover:text-white transition-colors"
+              >
+                Podcast
               </Link>
               <Link
                 to="/about"

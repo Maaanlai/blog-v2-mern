@@ -283,6 +283,50 @@ export const trendingBlogs = async (req, res) => {
 		})
 }
 
+
+export const getPodcastBlogs = async (req, res) => {
+	const { page = 1 } = req.body
+	const maxLimit = 5
+
+	Blog.find({ draft: false, tags: "podcast" })
+		.populate(
+			"author",
+			"personal_info.profile_img personal_info.username personal_info.fullName -_id"
+		)
+		.sort({ publishedAt: -1 })
+		.select("blog_id title des banner activity tags publishedAt -_id")
+		.skip((page - 1) * maxLimit)
+		.limit(maxLimit)
+		.then((blogs) => {
+			return res.status(200).json({
+				status: 6000,
+				blogs,
+			})
+		})
+		.catch((error) => {
+			return res.status(500).json({
+				status: 6001,
+				message: error?.message,
+			})
+		})
+}
+
+export const getPodcastBlogsCount = async (req, res) => {
+	Blog.countDocuments({ draft: false, tags: "podcast" })
+		.then((count) => {
+			return res.status(200).json({
+				status: 6000,
+				totalDocs: count,
+			})
+		})
+		.catch((error) => {
+			return res.status(500).json({
+				status: 6001,
+				message: error?.message,
+			})
+		})
+}
+
 export const searchBlogs = async (req, res) => {
 	/**
 	 * $ne: `eliminate_blog` => this will find only blog id not equals to `eliminate_blog`

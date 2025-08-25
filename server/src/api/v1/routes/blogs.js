@@ -17,6 +17,8 @@ import {
     isUserLiked,
     deleteBlog,
     latestPodcast,
+    getPodcastBlogs,
+    getPodcastBlogsCount,
 } from "../controllers/blogs.js"
 
 const router = express.Router()
@@ -31,7 +33,8 @@ router.post("/search/total-posts", searchBlogsCount)
 
 router.post("/latest", latestBlogs)
 router.post("/latest/total-posts", latestBlogsCount)
-router.post("/podcast", latestPodcast)
+router.post("/podcast", getPodcastBlogs)
+router.post("/podcast/total-posts", getPodcastBlogsCount)
 
 router.get("/trending", trendingBlogs)
 
