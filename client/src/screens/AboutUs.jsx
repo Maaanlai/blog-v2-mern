@@ -1,11 +1,44 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { user } from "../assets";
+import {
+  BriefcaseIcon,
+  PuzzlePieceIcon,
+  AcademicCapIcon,
+  LightBulbIcon,
+} from "@heroicons/react/24/outline";
 
 const AboutUs = () => {
   const [faqOpen, setFaqOpen] = useState(null);
   const toggleFAQ = (index) => {
     setFaqOpen(faqOpen === index ? null : index);
   };
+
+  const values = [
+    {
+      title: "Мэргэжлийн байх",
+      description:
+        "Бид харилцагч нартаа мэргэжлийн түвшний үйлчилгээг үзүүлэхийг нэн тэргүүнд эрхэмлэдэг.",
+      icon: BriefcaseIcon,
+    },
+    {
+      title: "Тусгайлан боловсруулсан шийдэл",
+      description:
+        "Харилцагч бүрийн хэрэгцээнд тохируулсан шийдлийг мэргэжлийн өндөр түвшинд боловсруулдаг.",
+      icon: PuzzlePieceIcon,
+    },
+    {
+      title: "Мэдлэг, чадвартай бизнес",
+      description:
+        "Харилцагчдадаа дотоодын МУТС-тэй тэмцэх үйл ажиллагааг бүрдүүлж бэхжүүлэхэд шаардлагатай зөвлөгөө, сургалтыг олгодог.",
+      icon: AcademicCapIcon,
+    },
+    {
+      title: "Энгийн ба ойлгомжтой байдал",
+      description:
+        "Төвөгтэй зохицуулалтыг ойлгоход хялбар, хэрэгжүүлэхэд амар болгодог.",
+      icon: LightBulbIcon,
+    },
+  ];
 
   return (
     <div className="max-w-6xl mx-auto p-6">
@@ -39,24 +72,19 @@ const AboutUs = () => {
       {/* Үнэт зүйлс */}
       <section className="mt-10">
         <h2 className="text-2xl font-semibold text-center">Үнэт зүйлс</h2>
-        <div className="grid md:grid-cols-2 gap-6 mt-4">
-          {[
-            "Мэргэжлийн байх",
-            "Тусгайлан боловсруулсан шийдэл",
-            "Мэдлэг, чадвартай бизнес",
-            "Энгийн ба ойлгомжтой байдал",
-          ].map((title, index) => (
-            <div key={index} className="bg-white shadow-lg rounded-lg p-6">
-              <h3 className="text-xl font-semibold">{title}</h3>
-              <p className="text-gray-700 mt-2">
-                {index === 0
-                  ? "Бид харилцагч нартаа мэргэжлийн түвшний үйлчилгээг үзүүлэхийг нэн тэргүүнд эрхэмлэдэг."
-                  : index === 1
-                  ? "Харилцагч бүрийн хэрэгцээнд тохируулсан шийдлийг мэргэжлийн өндөр түвшинд боловсруулдаг."
-                  : index === 2
-                  ? "Харилцагчдадаа дотоодын МУТС-тэй тэмцэх үйл ажиллагааг бүрдүүлж бэхжүүлэхэд шаардлагатай зөвлөгөө, сургалтыг олгодог."
-                  : "Төвөгтэй зохицуулалтыг ойлгоход хялбар, хэрэгжүүлэхэд амар болгодог."}
-              </p>
+        <div className="grid md:grid-cols-2 gap-6 mt-6">
+          {values.map((item, index) => (
+            <div
+              key={index}
+              className="bg-white shadow-lg rounded-lg p-6 flex items-start gap-4"
+            >
+              <item.icon className="w-8 h-8 text-purple-600 flex-shrink-0" />
+              <div>
+                <p className="text-lg font-semibold leading-snug">
+                  {item.title}
+                </p>
+                <p className="text-gray-700 mt-1">{item.description}</p>
+              </div>
             </div>
           ))}
         </div>
