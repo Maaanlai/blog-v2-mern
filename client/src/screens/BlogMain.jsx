@@ -1,7 +1,9 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
+import axios from "axios";
+import { Link } from "react-router-dom";
 import AnimationWrapper from "../components/common/AnimationWrapper.jsx";
 import Loader from "../components/common/Loader.jsx";
-import axios from "axios";
+import { filterPaginationData } from "../functions/paginationData.js";
 
 const NodataMessage = ({ message }) => (
   <div className="text-center py-12">
@@ -14,13 +16,14 @@ const BlogMain = () => {
   const [trendingBlogs, setTrendingBlogs] = useState(null);
   const [pageState, setPageState] = useState("home");
   const [error, setError] = useState(null);
+  const [email, setEmail] = useState("");
+  const [subscriptionStatus, setSubscriptionStatus] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const observer = useRef();
 
   const categories = [
     "finance",
-    "programming",
     "fraud",
     "new",
     "trading",
@@ -30,108 +33,137 @@ const BlogMain = () => {
     "economy",
   ];
 
-  const fetchLatestBlogs = async ({ page = 1 }) => {
-    try {
-      setIsLoading(true);
-      setError(null);
+  const fetchLatestBlogs = useCallback(({ page = 1 }) => {
+    setBlogs((currentBlogs) => {
+      axios
+        .post(`/api/v1/blogs/latest`, { page })
+        .then(async ({ data }) => {
+          const formattedData = await filterPaginationData({
+            state: currentBlogs,
+            data: data?.blogs,
+            page,
+            countRoute: "blogs/latest/total-posts",
+          });
 
-      const response = await axios.post("/api/v1/blogs/latest", {
-        page,
-        ...(pageState !== "home" && { category: pageState }),
+          // Calculate if there are more pages
+          const hasMore =
+            formattedData.results.length < formattedData.totalDocs;
+          setBlogs({ ...formattedData, hasMore });
+        })
+        .catch((error) => {
+          console.log("Error fetching latest blogs:", error);
+          setError("Failed to load articles. Please try again.");
+        });
+      return currentBlogs;
+    });
+  }, []);
+
+  const fetchBlogsByCategory = useCallback(
+    ({ page = 1 }) => {
+      setBlogs((currentBlogs) => {
+        axios
+          .post(`/api/v1/blogs/search`, {
+            tag: pageState,
+            page,
+          })
+          .then(async ({ data }) => {
+            const formattedData = await filterPaginationData({
+              state: currentBlogs,
+              data: data?.blogs,
+              page,
+              countRoute: "blogs/search/total-posts",
+              dataToSend: { tag: pageState },
+            });
+
+            // Calculate if there are more pages
+            const hasMore =
+              formattedData.results.length < formattedData.totalDocs;
+            setBlogs({ ...formattedData, hasMore });
+          })
+          .catch((error) => {
+            console.log("Error fetching blogs by category:", error);
+            setError("Failed to load articles. Please try again.");
+          });
+        return currentBlogs;
       });
+    },
+    [pageState]
+  );
 
-      if (response.data.status === 6000) {
-        setBlogs((prevBlogs) => ({
-          results:
-            page === 1
-              ? response.data.blogs
-              : [...(prevBlogs?.results || []), ...response.data.blogs],
-          page: page,
-          hasMore: response.data.blogs.length > 0,
-        }));
-      }
-    } catch (error) {
-      console.error("Error fetching latest blogs:", error);
-      setError("Failed to load articles. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const fetchTrendingBlogs = async () => {
-    try {
-      const response = await axios.get("/api/v1/blogs/trending");
-      if (response.data.status === 6000) {
-        setTrendingBlogs(response.data.blogs);
-      }
-    } catch (error) {
-      console.error("Error fetching trending blogs:", error);
-    }
-  };
-
-  const searchBlogs = async (query, page = 1) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-
-      const response = await axios.post("/api/v1/blogs/search", {
-        query,
-        page,
-        ...(pageState !== "home" && { category: pageState }),
+  const fetchTrendingBlogs = useCallback(() => {
+    axios
+      .get(`/api/v1/blogs/trending`)
+      .then(({ data }) => {
+        setTrendingBlogs(data?.blogs);
+      })
+      .catch((error) => {
+        console.log("Error fetching trending blogs:", error);
       });
+  }, []);
 
-      if (response.data.status === 6000) {
-        setBlogs((prevBlogs) => ({
-          results:
-            page === 1
-              ? response.data.blogs
-              : [...(prevBlogs?.results || []), ...response.data.blogs],
-          page: page,
-          hasMore: response.data.blogs.length > 0,
-        }));
-      }
-    } catch (error) {
-      console.error("Error searching blogs:", error);
-      setError("Failed to search articles. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSearch = (e) => {
+  const handleNewsletterSubscription = async (e) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      setBlogs(null);
-      searchBlogs(searchQuery.trim(), 1);
-    } else {
-      setBlogs(null);
-      fetchLatestBlogs({ page: 1 });
+    if (!email) {
+      setSubscriptionStatus({
+        type: "error",
+        message: "Please enter your email address",
+      });
+      return;
     }
+
+    try {
+      setSubscriptionStatus({ type: "loading", message: "Subscribing..." });
+
+      const response = await axios.post(`/api/v1/newsletter/subscribe`, {
+        email,
+      });
+
+      if (response.data.status === 6000) {
+        setSubscriptionStatus({
+          type: "success",
+          message: "Successfully subscribed!",
+        });
+        setEmail(""); // Clear the email input
+      }
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message ||
+        "Failed to subscribe. Please try again.";
+      setSubscriptionStatus({ type: "error", message: errorMessage });
+    }
+
+    // Clear status after 3 seconds
+    setTimeout(() => {
+      setSubscriptionStatus(null);
+    }, 3000);
   };
 
   useEffect(() => {
     setBlogs(null);
     setError(null);
-    setSearchQuery("");
 
-    if (pageState === "home" || categories.includes(pageState)) {
+    if (pageState === "home") {
       fetchLatestBlogs({ page: 1 });
+    } else {
+      fetchBlogsByCategory({ page: 1 });
     }
+  }, [pageState, fetchLatestBlogs, fetchBlogsByCategory]);
 
+  useEffect(() => {
     if (!trendingBlogs) {
       fetchTrendingBlogs();
     }
-  }, [pageState]);
+  }, [fetchTrendingBlogs, trendingBlogs]);
 
   useEffect(() => {
     if (!blogs?.hasMore || isLoading) return;
 
     observer.current = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting && !isLoading) {
-        if (searchQuery.trim()) {
-          searchBlogs(searchQuery.trim(), blogs.page + 1);
-        } else {
+      if (entries[0].isIntersecting) {
+        if (pageState === "home") {
           fetchLatestBlogs({ page: blogs.page + 1 });
+        } else {
+          fetchBlogsByCategory({ page: blogs.page + 1 });
         }
       }
     });
@@ -142,100 +174,93 @@ const BlogMain = () => {
     }
 
     return () => observer.current?.disconnect();
-  }, [blogs, isLoading, searchQuery]);
-
+  }, [blogs, pageState, fetchLatestBlogs, fetchBlogsByCategory]);
   const renderBlogCards = () => {
-    return blogs.results.map((blog, index) => (
-      <AnimationWrapper key={blog.blog_id} transition={{ delay: index * 0.1 }}>
-        <article className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden group cursor-pointer">
-          <div className="relative overflow-hidden">
-            <img
-              src={
-                blog.banner ||
-                `https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&h=400&fit=crop`
-              }
-              alt={blog.title}
-              className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-            />
-            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300"></div>
-            <div className="absolute top-4 left-4">
-              <span className="px-3 py-1 bg-white/90 text-gray-800 text-xs font-medium rounded-full">
-                {blog.tags?.[0] || "Article"}
-              </span>
-            </div>
-          </div>
-
-          <div className="p-6">
-            <div className="flex items-center gap-3 mb-4">
+    return blogs.results.map((blog) => (
+      <AnimationWrapper key={blog.blog_id} transition={{ delay: 0.1 }}>
+        <Link to={`/blog/${blog.blog_id}`}>
+          <article className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden group cursor-pointer">
+            <div className="relative overflow-hidden">
               <img
-                src={blog.author.personal_info.profile_img}
-                alt={blog.author.personal_info.fullName}
-                className="w-10 h-10 rounded-full object-cover"
+                src={
+                  blog.banner ||
+                  `https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&h=400&fit=crop`
+                }
+                alt={blog.title}
+                className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
               />
-              <div>
-                <p className="text-sm font-medium text-gray-900">
-                  {blog.author.personal_info.fullName}
-                </p>
-                <p className="text-xs text-gray-500">
-                  {new Date(blog.publishedAt).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </p>
+              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300"></div>
+              <div className="absolute top-4 left-4">
+                <span className="px-3 py-1 bg-white/90 text-gray-800 text-xs font-medium rounded-full">
+                  {blog.tags?.[0] || "Article"}
+                </span>
               </div>
             </div>
 
-            <h2 className="text-xl font-light text-gray-900 mb-3 leading-tight group-hover:text-gray-700 transition-colors duration-200">
-              {blog.title}
-            </h2>
-
-            <p className="text-gray-600 leading-relaxed mb-4 line-clamp-2">
-              {blog.des}
-            </p>
-
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4 text-sm text-gray-500">
-                <span className="flex items-center gap-1">
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                    />
-                  </svg>
-                  {blog.activity.total_likes}
-                </span>
-                <span className="flex items-center gap-1">
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                    />
-                  </svg>
-                  {blog.activity.total_comments}
-                </span>
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="text-align-right">
+                  <p className="text-xs text-gray-500">
+                    {new Date(blog.publishedAt).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </p>
+                </div>
               </div>
 
-              <span className="text-sm text-gray-400 group-hover:text-gray-600 transition-colors duration-200">
-                Read more →
-              </span>
+              <h2 className="text-xl font-light text-gray-900 mb-3 leading-tight group-hover:text-gray-700 transition-colors duration-200">
+                {blog.title}
+              </h2>
+
+              <p className="text-gray-600 leading-relaxed mb-4 line-clamp-2">
+                {blog.des}
+              </p>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4 text-sm text-gray-500">
+                  <span className="flex items-center gap-1">
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                      />
+                    </svg>
+                    {blog.activity?.total_likes || 0}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                      />
+                    </svg>
+                    {blog.activity?.total_comments || 0}
+                  </span>
+                </div>
+
+                <span className="text-sm text-gray-400 group-hover:text-gray-600 transition-colors duration-200">
+                  Read more →
+                </span>
+              </div>
             </div>
-          </div>
-        </article>
+          </article>
+        </Link>
       </AnimationWrapper>
     ));
   };
@@ -333,14 +358,15 @@ const BlogMain = () => {
                   </div>
                 ) : trendingBlogs?.length ? (
                   <div className="space-y-4">
-                    {trendingBlogs.map((blog, index) => (
-                      <div key={blog.blog_id} className="group cursor-pointer">
+                    {trendingBlogs.map((blog) => (
+                      <Link
+                        to={`/blog/${blog.blog_id}`}
+                        key={blog.blog_id}
+                        className="group cursor-pointer"
+                      >
                         <div className="flex gap-3">
                           <img
-                            src={
-                              blog.banner ||
-                              `https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=100&h=100&fit=crop`
-                            }
+                            src={blog.banner}
                             alt={blog.title}
                             className="w-16 h-16 rounded-lg object-cover"
                           />
@@ -359,7 +385,7 @@ const BlogMain = () => {
                             </div>
                           </div>
                         </div>
-                      </div>
+                      </Link>
                     ))}
                   </div>
                 ) : (
@@ -375,16 +401,43 @@ const BlogMain = () => {
                 <p className="text-sm text-gray-300 mb-4">
                   Get the latest articles delivered to your inbox
                 </p>
-                <div className="flex flex-col gap-2">
+                <form
+                  onSubmit={handleNewsletterSubscription}
+                  className="flex flex-col gap-2"
+                >
                   <input
                     type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     placeholder="Your email address"
                     className="px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/30"
+                    disabled={subscriptionStatus?.type === "loading"}
                   />
-                  <button className="px-4 py-2 bg-white text-gray-900 rounded-lg hover:bg-gray-100 transition-colors duration-200 text-sm font-medium">
-                    Subscribe
+                  <button
+                    type="submit"
+                    disabled={subscriptionStatus?.type === "loading"}
+                    className="px-4 py-2 bg-white text-gray-900 rounded-lg hover:bg-gray-100 transition-colors duration-200 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {subscriptionStatus?.type === "loading"
+                      ? "Subscribing..."
+                      : "Subscribe"}
                   </button>
-                </div>
+                </form>
+
+                {/* Status Message */}
+                {subscriptionStatus && (
+                  <div
+                    className={`mt-3 text-sm ${
+                      subscriptionStatus.type === "success"
+                        ? "text-green-300"
+                        : subscriptionStatus.type === "error"
+                        ? "text-red-300"
+                        : "text-gray-300"
+                    }`}
+                  >
+                    {subscriptionStatus.message}
+                  </div>
+                )}
               </div>
             </div>
           </aside>

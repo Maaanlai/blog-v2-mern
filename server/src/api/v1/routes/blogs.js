@@ -4,6 +4,8 @@ import express from "express"
 import { verifyJWT } from "../../../middlewares/index.js"
 import {
     getUploadUrl,
+    uploadFile,
+    uploadImage,
     createBlog,
     latestBlogs,
     trendingBlogs,
@@ -15,11 +17,15 @@ import {
     isUserLiked,
     deleteBlog,
     latestPodcast,
+    getPodcastBlogs,
+    getPodcastBlogsCount,
 } from "../controllers/blogs.js"
 
 const router = express.Router()
 
-router.get("/get-upload-url", verifyJWT, getUploadUrl)
+// File upload routes
+router.post("/upload-file", verifyJWT, uploadImage, uploadFile)
+router.get("/get-upload-url", verifyJWT, getUploadUrl) // Legacy route for compatibility
 router.post("/create", verifyJWT, createBlog)
 
 router.post("/search", searchBlogs)
@@ -27,7 +33,8 @@ router.post("/search/total-posts", searchBlogsCount)
 
 router.post("/latest", latestBlogs)
 router.post("/latest/total-posts", latestBlogsCount)
-router.post("/podcast", latestPodcast)
+router.post("/podcast", getPodcastBlogs)
+router.post("/podcast/total-posts", getPodcastBlogsCount)
 
 router.get("/trending", trendingBlogs)
 

@@ -1,6 +1,7 @@
 import { nanoid } from "nanoid"
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import multer from "multer"
+import path from "path"
+import fs from "fs"
 
 // models
 import Blog from "../../../models/Blog.js"
@@ -9,52 +10,75 @@ import Notification from "../../../models/Notification.js"
 import Comment from "../../../models/Comment.js"
 
 // configs
-// import { s3 } from "../../../configs/index.js"
+import { serverConfig } from "../../../configs/index.js"
 
-const s3 = new S3Client({
-	region: "ap-northeast-1",
-	credentials: {
-		accessKeyId: process.env.AWS_ACCESS_KEY,
-		secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+	destination: (req, file, cb) => {
+		const uploadPath = path.join(process.cwd(), 'server/uploads');
+		// Create directory if it doesn't exist
+		if (!fs.existsSync(uploadPath)) {
+			fs.mkdirSync(uploadPath, { recursive: true });
+		}
+		cb(null, uploadPath);
 	},
+	filename: (req, file, cb) => {
+		const date = new Date();
+		const imageName = `${nanoid()}-${date.getTime()}${path.extname(file.originalname)}`;
+		cb(null, imageName);
+	}
 });
 
-/**
- * generating a api url for uploading images to aws s3 bucket
- *
- */
-const generateUploadUrl = async () => {
-	const date = new Date();
-	const imageName = `${nanoid()}-${date.getTime()}.jpeg`;
+const upload = multer({
+	storage: storage,
+	limits: {
+		fileSize: 5 * 1024 * 1024, // 5MB limit
+	},
+	fileFilter: (req, file, cb) => {
+		// Check if file is an image
+		if (file.mimetype.startsWith('image/')) {
+			cb(null, true);
+		} else {
+			cb(new Error('Only image files are allowed!'), false);
+		}
+	}
+});
 
-	const uploadParams = {
-		Bucket: "ubcompliance-tokyo1",
-		Key: imageName,
-		ContentType: "image/jpeg",
-	};
+// Single file upload middleware
+export const uploadImage = upload.single('image');
 
-	const command = new PutObjectCommand(uploadParams);
-
-	const signedUrl = await getSignedUrl(s3, command, { expiresIn: 3600 });
-	console.log(signedUrl)
-	return signedUrl;
-};
-
-
-export const getUploadUrl = async (req, res) => {
-	generateUploadUrl()
-		.then((url) =>
-			res.status(200).json({
-				status: 6000,
-				uploadUrl: url,
-			})
-		)
-		.catch((error) =>
-			res.status(500).json({
+export const uploadFile = async (req, res) => {
+	try {
+		if (!req.file) {
+			return res.status(400).json({
 				status: 6001,
-				message: error?.message,
-			})
-		)
+				message: "No file uploaded"
+			});
+		}
+
+		// Generate the URL for the uploaded file - use relative path for proxy
+		const fileUrl = `/uploads/${req.file.filename}`;
+
+		res.status(200).json({
+			status: 6000,
+			imageUrl: fileUrl,
+			filename: req.file.filename
+		});
+	} catch (error) {
+		res.status(500).json({
+			status: 6001,
+			message: error?.message
+		});
+	}
+}
+
+// Legacy function for compatibility - now returns a placeholder
+export const getUploadUrl = async (req, res) => {
+	res.status(200).json({
+		status: 6000,
+		message: "Please use the /upload-file endpoint for file uploads",
+		uploadUrl: null
+	});
 }
 
 export const createBlog = async (req, res) => {
@@ -243,12 +267,56 @@ export const trendingBlogs = async (req, res) => {
 			"activity.total_likes": -1,
 			publishedAt: -1,
 		})
-		.select("blog_id title publishedAt -_id")
+		.select("blog_id title publishedAt -_id banner")
 		.limit(5)
 		.then((blogs) => {
 			return res.status(200).json({
 				status: 6000,
 				blogs,
+			})
+		})
+		.catch((error) => {
+			return res.status(500).json({
+				status: 6001,
+				message: error?.message,
+			})
+		})
+}
+
+
+export const getPodcastBlogs = async (req, res) => {
+	const { page = 1 } = req.body
+	const maxLimit = 5
+
+	Blog.find({ draft: false, tags: "podcast" })
+		.populate(
+			"author",
+			"personal_info.profile_img personal_info.username personal_info.fullName -_id"
+		)
+		.sort({ publishedAt: -1 })
+		.select("blog_id title des banner activity tags publishedAt -_id")
+		.skip((page - 1) * maxLimit)
+		.limit(maxLimit)
+		.then((blogs) => {
+			return res.status(200).json({
+				status: 6000,
+				blogs,
+			})
+		})
+		.catch((error) => {
+			return res.status(500).json({
+				status: 6001,
+				message: error?.message,
+			})
+		})
+}
+
+export const getPodcastBlogsCount = async (req, res) => {
+	Blog.countDocuments({ draft: false, tags: "podcast" })
+		.then((count) => {
+			return res.status(200).json({
+				status: 6000,
+				totalDocs: count,
 			})
 		})
 		.catch((error) => {

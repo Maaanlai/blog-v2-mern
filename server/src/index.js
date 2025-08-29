@@ -17,6 +17,7 @@ import commentsRouter from "./api/v1/routes/comments.js";
 import notificationRouter from "./api/v1/routes/notification.js";
 import adminRouter from "./api/v1/routes/admin.js";
 import courseRouter from "./api/v1/routes/course.js";
+import newsletterRouter from "./api/v1/routes/newsletter.js";
 
 const __dirname = path.resolve();
 
@@ -25,6 +26,9 @@ const app = express();
 // middlewares
 app.use(cors());
 app.use(express.json());
+
+// Serve static files from uploads directory
+app.use('/uploads', express.static(path.join(__dirname, 'server/uploads')));
 
 // start server
 Server.startServer(app);
@@ -42,6 +46,7 @@ app.use("/api/v1/comments/", commentsRouter);
 app.use("/api/v1/notifications/", notificationRouter);
 app.use("/api/v1/admin/", adminRouter);
 app.use("/api/v1/course/", courseRouter);
+app.use("/api/v1/newsletter/", newsletterRouter);
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "/client/dist")));

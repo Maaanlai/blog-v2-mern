@@ -1,59 +1,40 @@
 import { Fragment, useEffect, useState } from "react";
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import axios from "axios";
 import UserNavigationPanel from "./UserNavigationPanel";
+import Footer from "./Footer";
 
 import { useStateContext } from "../contexts/GlobalContext";
 
-// functions
-import { setSession } from "../functions/session";
-
 // assets
-import { logoDark, logoLight, user } from "../assets";
+import { user, logo } from "../assets";
 
 const Navbar = () => {
-  const [searchboxVisibility, setSearchBoxVisibility] = useState(false);
   const [userNavPanel, setUserNavPanel] = useState(false);
-
-  const navigate = useNavigate();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const {
     userData,
-    userData: { access_token, profile_img, new_notification_available },
     updateUserData,
     theme,
-    setTheme,
     adminData,
     adminData: { admin_token },
   } = useStateContext();
 
-  const changeTheme = () => {
-    let newTheme = theme == "light" ? "dark" : "light";
-
-    setTheme(newTheme);
-
-    document.body.setAttribute("data-theme", newTheme);
-
-    setSession("theme", newTheme);
-  };
-
   const handleUserNavPanel = () => {
     setUserNavPanel((current) => !current);
   };
+
   const handleBlur = () => {
     setTimeout(() => setUserNavPanel(false), 200);
   };
 
-  // search
-  const handleSearch = (event) => {
-    const query = event.target.value;
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen((current) => !current);
+  };
 
-    console.log(event);
-
-    if (event.keyCode === 13 && query.length) {
-      navigate(`/search/${query}`);
-      console.log("hello");
-    }
+  const closeMobileMenu = () => {
+    setMobileMenuOpen(false);
   };
 
   useEffect(() => {
@@ -74,19 +55,20 @@ const Navbar = () => {
           console.log(error);
         });
     }
-  }, [adminData]);
+  }, [adminData, admin_token, updateUserData, userData]);
 
   return (
     <Fragment>
-      <nav className="navbar z-50">
+      <nav className="navbar z-50 relative">
         <Link to="/" className="flex-none w-10">
           <img
-            src={theme == "light" ? logoDark : logoLight}
+            src={theme == "light" ? logo : logo}
             alt="logo"
             className="w-full"
           />
         </Link>
 
+        {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-8 ml-8">
           <Link
             to="/blog-main"
@@ -100,17 +82,11 @@ const Navbar = () => {
           >
             Бүтээгдэхүүн үйлчилгээ
           </Link>
-          <Link
-            to="/course"
-            className="text-dark-grey hover:text-black dark:hover:text-white transition-colors"
-          >
-            Сургалт материал
-          </Link>
-          <Link
+                    <Link
             to="/podcast"
             className="text-dark-grey hover:text-black dark:hover:text-white transition-colors"
           >
-            Подкаст
+            Podcast
           </Link>
           <Link
             to="/about"
@@ -120,51 +96,10 @@ const Navbar = () => {
           </Link>
         </div>
 
-        {/* <div
-					className={
-						"absolute bg-white w-full left-0 top-full mt-0.5 border-b border-grey py-4 px-[5vw] md:border-0 md:block md:relative md:inset-0 md:p-0 md:w-auto md:show " +
-						(searchboxVisibility ? "sow" : "hide")
-					}
-				>
-					<input
-						type="text"
-						name=""
-						placeholder="Search"
-						className="w-full md:w-auto bg-grey p-4 pl-6 pr-[12%] md:pr-6 rounded-full placeholder:text-dark-grey md:pl-12"
-						onKeyDown={handleSearch}
-					/>
-
-					<i className="fi fi-rr-search absolute right-[10%] md:pointer-events-none md:left-5 top-1/2 -translate-y-1/2 text-xl text-dark-grey"></i>
-				</div> */}
-
-        <div className="flex items-right gap-3 md:gap-6 ml-auto">
-          <button
-            className="md:hidden bg-grey w-12 h-12 rounded-full flex items-center justify-center"
-            onClick={() => setSearchBoxVisibility((current) => !current)}
-          >
-            <i className="fi fi-rr-search text-xl"></i>
-          </button>
-          {/* <Link to="/editor" className="hidden md:flex gap-2 link">
-						<i className="fi fi-rr-file-edit"></i>
-						<p>Write</p>
-					</Link> */}
-
-          {/* change theme */}
-          {/* <button
-            className="w-12 h-12 rounded-full bg-grey relative hover:bg-black/20"
-            onClick={changeTheme}
-          >
-            <i
-              className={
-                "fi fi-rr-" +
-                (theme == "light" ? "moon-stars" : "sun") +
-                " text-2xl block mt-1"
-              }
-            ></i>
-          </button> */}
-
+        <div className="flex items-center gap-3 md:gap-6 ml-auto">
+          {/* Desktop User Navigation */}
           {adminData.admin_token && adminData.admin_token !== null && (
-            <>
+            <div className="hidden md:block">
               <div
                 className="relative"
                 onClick={handleUserNavPanel}
@@ -180,12 +115,111 @@ const Navbar = () => {
 
                 {userNavPanel && <UserNavigationPanel />}
               </div>
-            </>
+            </div>
           )}
+
+          {/* Hamburger Menu Button */}
+          <button
+            onClick={toggleMobileMenu}
+            aria-label="Toggle mobile menu"
+            className="md:hidden bg-grey w-12 h-12 rounded-full flex items-center justify-center hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
+          >
+            {mobileMenuOpen ? (
+              <svg
+                className="w-6 h-6 text-black dark:text-white"
+                fill="none"
+                stroke="black"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            ) : (
+              <svg
+                className="w-6 h-6 text-black dark:text-white"
+                fill="none"
+                stroke="black"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            )}
+          </button>
         </div>
+
+        {/* Mobile Navigation Menu */}
+        {mobileMenuOpen && (
+          <div className="absolute top-full left-0 w-full bg-white dark:bg-black border-b border-grey md:hidden z-50 shadow-lg">
+            <div className="px-6 py-4 space-y-2">
+              <Link
+                to="/blog-main"
+                className="block text-dark-grey hover:text-black dark:hover:text-white transition-colors py-3 border-b border-grey/20"
+                onClick={closeMobileMenu}
+              >
+                Нийтлэл мэдээлэл
+              </Link>
+              <Link
+                to="/products"
+                className="block text-dark-grey hover:text-black dark:hover:text-white transition-colors py-3 border-b border-grey/20"
+                onClick={closeMobileMenu}
+              >
+                Бүтээгдэхүүн үйлчилгээ
+              </Link>
+              <Link
+                to="/podcast"
+                className="text-dark-grey hover:text-black dark:hover:text-white transition-colors"
+              >
+                Podcast
+              </Link>
+              <Link
+                to="/about"
+                className="block text-dark-grey hover:text-black dark:hover:text-white transition-colors py-3"
+                onClick={closeMobileMenu}
+              >
+                Бидний тухай
+              </Link>
+
+              {/* Mobile User Navigation */}
+              {adminData.admin_token && adminData.admin_token !== null && (
+                <div className="pt-4 border-t border-grey">
+                  <div className="flex items-center gap-3 py-2">
+                    <img
+                      className="w-10 h-10 object-cover rounded-full"
+                      src={user}
+                      alt="user"
+                    />
+                    <span className="text-dark-grey dark:text-white">
+                      Admin Panel
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Overlay to close mobile menu when clicking outside */}
+        {mobileMenuOpen && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+            onClick={closeMobileMenu}
+          ></div>
+        )}
       </nav>
 
       <Outlet />
+      <Footer />
     </Fragment>
   );
 };

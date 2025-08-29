@@ -1,6 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import axios from "axios";
+import { Link } from "react-router-dom";
 import AnimationWrapper from "../components/common/AnimationWrapper.jsx";
 import Loader from "../components/common/Loader.jsx";
+import { filterPaginationData } from "../functions/paginationData.js";
 
 const NodataMessage = ({ message }) => (
   <div className="text-center py-12">
@@ -22,6 +25,8 @@ const Home = () => {
   const [trendingBlogs, setTrendingBlogs] = useState(null);
   const [pageState, setPageState] = useState("home");
   const [totalDocs, setTotalDocs] = useState(0);
+  const [email, setEmail] = useState("");
+  const [subscriptionStatus, setSubscriptionStatus] = useState(null);
 
   const categories = [
     "finance",
@@ -34,136 +39,107 @@ const Home = () => {
     "economy",
   ];
 
-  // API base URL - adjust this to match your backend
-  const API_BASE_URL = "http://127.0.0.1:8080";
-  const BLOG_API_BASE = `${API_BASE_URL}/api/v1/blogs`;
+  const fetchLatestBlogs = useCallback(({ page = 1 }) => {
+    setBlogs((currentBlogs) => {
+      axios
+        .post(`/api/v1/blogs/latest`, { page })
+        .then(async ({ data }) => {
+          const formattedData = await filterPaginationData({
+            state: currentBlogs,
+            data: data?.blogs,
+            page,
+            countRoute: "blogs/latest/total-posts",
+          });
 
-  const fetchLatestBlogs = async ({ page = 1 }) => {
-    try {
-      const response = await fetch(`${BLOG_API_BASE}/latest`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ page }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch latest blogs");
-      }
-
-      const data = await response.json();
-
-      if (page === 1) {
-        setBlogs({
-          results: data.blogs || [],
-          page: page,
-          hasMore: data.blogs && data.blogs.length > 0,
+          // Calculate if there are more pages
+          const hasMore =
+            formattedData.results.length < formattedData.totalDocs;
+          setBlogs({ ...formattedData, hasMore });
+        })
+        .catch((error) => {
+          console.log("Error fetching latest blogs:", error);
         });
-      } else {
-        setBlogs((prev) => ({
-          results: [...prev.results, ...(data.blogs || [])],
-          page: page,
-          hasMore: data.blogs && data.blogs.length > 0,
-        }));
-      }
-    } catch (error) {
-      console.error("Error fetching latest blogs:", error);
-      setBlogs({
-        results: [],
-        page: 1,
-        hasMore: false,
+      return currentBlogs;
+    });
+  }, []);
+
+  const fetchBlogsByCategory = useCallback(
+    ({ page = 1 }) => {
+      setBlogs((currentBlogs) => {
+        axios
+          .post(`/api/v1/blogs/search`, {
+            tag: pageState,
+            page,
+          })
+          .then(async ({ data }) => {
+            const formattedData = await filterPaginationData({
+              state: currentBlogs,
+              data: data?.blogs,
+              page,
+              countRoute: "blogs/search/total-posts",
+              dataToSend: { tag: pageState },
+            });
+
+            // Calculate if there are more pages
+            const hasMore =
+              formattedData.results.length < formattedData.totalDocs;
+            setBlogs({ ...formattedData, hasMore });
+          })
+          .catch((error) => {
+            console.log("Error fetching blogs by category:", error);
+          });
+        return currentBlogs;
       });
+    },
+    [pageState]
+  );
+
+  const fetchTrendingBlogs = useCallback(() => {
+    axios
+      .get(`/api/v1/blogs/trending`)
+      .then(({ data }) => {
+        setTrendingBlogs(data?.blogs);
+      })
+      .catch((error) => {
+        console.log("Error fetching trending blogs:", error);
+      });
+  }, []);
+
+  const handleNewsletterSubscription = async (e) => {
+    e.preventDefault();
+    if (!email) {
+      setSubscriptionStatus({
+        type: "error",
+        message: "Please enter your email address",
+      });
+      return;
     }
-  };
 
-  const fetchBlogsByCategory = async ({ page = 1 }) => {
     try {
-      const response = await fetch(`${BLOG_API_BASE}/search`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          tag: pageState,
-          page,
-        }),
+      setSubscriptionStatus({ type: "loading", message: "Subscribing..." });
+
+      const response = await axios.post(`/api/v1/newsletter/subscribe`, {
+        email,
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch blogs by category");
-      }
-
-      const data = await response.json();
-
-      if (page === 1) {
-        setBlogs({
-          results: data.blogs || [],
-          page: page,
-          hasMore: data.blogs && data.blogs.length > 0,
+      if (response.data.status === 6000) {
+        setSubscriptionStatus({
+          type: "success",
+          message: "Successfully subscribed!",
         });
-      } else {
-        setBlogs((prev) => ({
-          results: [...prev.results, ...(data.blogs || [])],
-          page: page,
-          hasMore: data.blogs && data.blogs.length > 0,
-        }));
+        setEmail(""); // Clear the email input
       }
     } catch (error) {
-      console.error("Error fetching blogs by category:", error);
-      setBlogs({
-        results: [],
-        page: 1,
-        hasMore: false,
-      });
+      const errorMessage =
+        error.response?.data?.message ||
+        "Failed to subscribe. Please try again.";
+      setSubscriptionStatus({ type: "error", message: errorMessage });
     }
-  };
 
-  const fetchTrendingBlogs = async () => {
-    try {
-      const response = await fetch(`${BLOG_API_BASE}/trending`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch trending blogs");
-      }
-
-      const data = await response.json();
-      setTrendingBlogs(data.blogs || []);
-    } catch (error) {
-      console.error("Error fetching trending blogs:", error);
-      setTrendingBlogs([]);
-    }
-  };
-
-  const fetchTotalPosts = async () => {
-    try {
-      const endpoint =
-        pageState === "home" ? "/latest/total-posts" : "/search/total-posts";
-      const body = pageState === "home" ? {} : { tag: pageState };
-
-      const response = await fetch(`${BLOG_API_BASE}${endpoint}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch total posts");
-      }
-
-      const data = await response.json();
-      setTotalDocs(data.totalDocs || 0);
-    } catch (error) {
-      console.error("Error fetching total posts:", error);
-      setTotalDocs(0);
-    }
+    // Clear status after 3 seconds
+    setTimeout(() => {
+      setSubscriptionStatus(null);
+    }, 3000);
   };
 
   const handleLoadCategory = (event) => {
@@ -186,16 +162,13 @@ const Home = () => {
     } else {
       fetchBlogsByCategory({ page: 1 });
     }
+  }, [pageState, fetchLatestBlogs, fetchBlogsByCategory]);
 
+  useEffect(() => {
     if (!trendingBlogs) {
       fetchTrendingBlogs();
     }
-
-    fetchTotalPosts();
-  }, [pageState]);
-
-  // Calculate if there are more posts to load
-  const hasMorePosts = blogs && blogs.results.length < totalDocs;
+  }, [fetchTrendingBlogs, trendingBlogs]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -204,7 +177,7 @@ const Home = () => {
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="relative z-10 max-w-4xl mx-auto px-4 py-20 text-center">
           <h1 className="text-5xl md:text-6xl font-light tracking-wide mb-6">
-            UB Compliance
+            UBCompliance
           </h1>
           <p className="text-xl md:text-2xl font-light opacity-90 mb-8">
             Securing your financial wellbeing with insights on finance,
@@ -267,14 +240,6 @@ const Home = () => {
                     <article className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden">
                       <div className="p-8">
                         <div className="flex items-center gap-3 mb-4">
-                          <img
-                            src={
-                              blog?.author?.personal_info?.profile_img ||
-                              "/default-avatar.png"
-                            }
-                            alt={blog?.author?.personal_info?.fullname}
-                            className="w-10 h-10 rounded-full object-cover"
-                          />
                           <div>
                             <p className="text-sm font-medium text-gray-900">
                               {blog?.author?.personal_info?.fullname}
@@ -292,9 +257,11 @@ const Home = () => {
                           </div>
                         </div>
 
-                        <h2 className="text-2xl font-light text-gray-900 mb-4 leading-tight hover:text-gray-700 cursor-pointer">
-                          {blog?.title}
-                        </h2>
+                        <Link to={`/blog/${blog?.blog_id}`}>
+                          <h2 className="text-2xl font-light text-gray-900 mb-4 leading-tight hover:text-gray-700 cursor-pointer">
+                            {blog?.title}
+                          </h2>
+                        </Link>
 
                         <p className="text-gray-600 leading-relaxed mb-6 line-clamp-3">
                           {blog?.des}
@@ -381,8 +348,8 @@ const Home = () => {
                 <h3 className="text-lg font-light text-gray-900 mb-4">About</h3>
                 <p className="text-gray-600 text-sm leading-relaxed">
                   Welcome to our blog where we share insights about finance,
-                  programming, business, and technology. Stay tuned for the
-                  latest updates and trends.
+                  business, and technology. Stay tuned for the latest updates
+                  and trends.
                 </p>
               </div>
 
@@ -406,7 +373,10 @@ const Home = () => {
                           delay: index * 0.1,
                         }}
                       >
-                        <div className="group cursor-pointer">
+                        <Link
+                          to={`/blog/${blog?.blog_id}`}
+                          className="group cursor-pointer"
+                        >
                           <h4 className="text-sm font-medium text-gray-900 group-hover:text-gray-600 transition-colors duration-200 line-clamp-2 mb-2">
                             {blog?.title}
                           </h4>
@@ -417,7 +387,7 @@ const Home = () => {
                               {new Date(blog?.publishedAt).toLocaleDateString()}
                             </span>
                           </div>
-                        </div>
+                        </Link>
                       </AnimationWrapper>
                     ))}
                   </div>

@@ -10,7 +10,7 @@ import Table from "editorjs-table"
 import YoutubeEmber from 'editorjs-youtube-embed'
 
 // functions
-import { uploadImage } from "../../functions/aws"
+import { uploadImage } from "../../functions/upload"
 import { getSession } from "../../functions/session"
 
 const uploadImageByUrl = (img) => {

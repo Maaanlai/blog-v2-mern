@@ -14,7 +14,7 @@ import AnimationWrapper from "../common/AnimationWrapper";
 import { tools } from "./EditorTools";
 
 // functions
-import { uploadImage } from "../../functions/aws";
+import { uploadImage } from "../../functions/upload";
 
 // assets
 import { logoDark, logoLight, blogBanner, blogBannerDark } from "../../assets";
@@ -57,7 +57,7 @@ const BlogEditor = ({ setEditorState }) => {
 
     if (img) {
       const loadingToast = toast.loading("Uploading...");
-      uploadImage(img, access_token)
+      uploadImage(img, admin_token)
         .then((url) => {
           if (url) {
             toast.dismiss(loadingToast);

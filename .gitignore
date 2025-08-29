@@ -23,4 +23,13 @@ dist-ssr
 *.sln
 *.sw?
 
+web
+
 .env
+
+# Upload directory - keep folder but ignore uploaded files
+server/uploads/*
+!server/uploads/.gitkeep
+
+# Newsletter subscribers file
+server/newsletter-subscribers.txt
