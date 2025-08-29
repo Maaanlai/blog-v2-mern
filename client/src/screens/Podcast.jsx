@@ -32,7 +32,8 @@ const Podcast = () => {
           });
 
           // Calculate if there are more pages
-          const hasMore = formattedData.results.length < formattedData.totalDocs;
+          const hasMore =
+            formattedData.results.length < formattedData.totalDocs;
           setBlogs({ ...formattedData, hasMore });
         })
         .catch((error) => {
@@ -48,8 +49,9 @@ const Podcast = () => {
       .get(`/api/v1/blogs/trending`)
       .then(({ data }) => {
         // Filter trending blogs to only show podcast-related content
-        const podcastTrending = data?.blogs?.filter(blog => 
-          blog.tags?.includes('podcast') || blog.category === 'podcast'
+        const podcastTrending = data?.blogs?.filter(
+          (blog) =>
+            blog.tags?.includes("podcast") || blog.category === "podcast"
         );
         setTrendingBlogs(podcastTrending || []);
       })
@@ -144,8 +146,12 @@ const Podcast = () => {
               {/* Play button overlay */}
               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center">
-                  <svg className="w-6 h-6 text-gray-800 ml-1" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z"/>
+                  <svg
+                    className="w-6 h-6 text-gray-800 ml-1"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M8 5v14l11-7z" />
                   </svg>
                 </div>
               </div>
@@ -222,19 +228,20 @@ const Podcast = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <div className="relative bg-gradient-to-br from-red-900 via-red-800 to-red-900 text-white">
+      <div className="relative bg-gradient-to-br from-[#9b30ff] via-[#8a2be2] to-[#4b0082] text-white">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="relative z-10 max-w-4xl mx-auto px-4 py-16 text-center">
           <div className="flex items-center justify-center gap-3 mb-4">
             <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
+              <path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z" />
             </svg>
             <h1 className="text-4xl md:text-5xl font-light tracking-wide">
               Podcast Episodes
             </h1>
           </div>
           <p className="text-lg md:text-xl font-light opacity-90">
-            Listen to our latest discussions on finance, business, and innovation
+            Listen to our latest discussions on finance, business, and
+            innovation
           </p>
         </div>
       </div>
@@ -251,17 +258,24 @@ const Podcast = () => {
                 </h2>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center">
-                    <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
+                    <svg
+                      className="w-6 h-6 text-white"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z" />
                     </svg>
                   </div>
                   <div>
                     <h3 className="font-medium text-gray-900">All Episodes</h3>
-                    <p className="text-sm text-gray-500">Latest podcast content</p>
+                    <p className="text-sm text-gray-500">
+                      Latest podcast content
+                    </p>
                   </div>
                 </div>
                 <p className="text-sm text-gray-600 leading-relaxed">
-                  Dive deep into conversations about finance, business strategy, and market insights with industry experts.
+                  Dive deep into conversations about finance, business strategy,
+                  and market insights with industry experts.
                 </p>
               </div>
 
@@ -292,8 +306,12 @@ const Podcast = () => {
                             />
                             <div className="absolute inset-0 flex items-center justify-center">
                               <div className="w-6 h-6 bg-white/90 rounded-full flex items-center justify-center">
-                                <svg className="w-3 h-3 text-gray-800 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-                                  <path d="M8 5v14l11-7z"/>
+                                <svg
+                                  className="w-3 h-3 text-gray-800 ml-0.5"
+                                  fill="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path d="M8 5v14l11-7z" />
                                 </svg>
                               </div>
                             </div>
@@ -306,7 +324,9 @@ const Podcast = () => {
                               <span>{blog.author.personal_info.fullname}</span>
                               <span>•</span>
                               <span>
-                                {new Date(blog.publishedAt).toLocaleDateString()}
+                                {new Date(
+                                  blog.publishedAt
+                                ).toLocaleDateString()}
                               </span>
                             </div>
                           </div>
@@ -323,7 +343,9 @@ const Podcast = () => {
 
               {/* Newsletter Signup */}
               <div className="bg-gradient-to-br from-red-900 to-red-800 rounded-lg p-6 text-white">
-                <h3 className="text-lg font-light mb-2">Never Miss an Episode</h3>
+                <h3 className="text-lg font-light mb-2">
+                  Never Miss an Episode
+                </h3>
                 <p className="text-sm text-red-100 mb-4">
                   Get notified when new podcast episodes are released
                 </p>

@@ -263,7 +263,7 @@ const BlogMain = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <div className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
+      <div className="relative bg-gradient-to-br from-[#9b30ff] via-[#8a2be2] to-[#4b0082] text-white">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="relative z-10 max-w-4xl mx-auto px-4 py-16 text-center">
           <h1 className="text-4xl md:text-5xl font-light tracking-wide mb-4">
@@ -365,7 +365,7 @@ const BlogMain = () => {
               </div>
 
               {/* Newsletter Signup */}
-              <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-lg p-6 text-white">
+              <div className="relative bg-gradient-to-br from-[#9b30ff] via-[#8a2be2] to-[#4b0082] text-white rounded-lg p-6">
                 <h3 className="text-lg font-light mb-2">Stay Updated</h3>
                 <p className="text-sm text-gray-300 mb-4">
                   Get the latest articles delivered to your inbox

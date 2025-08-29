@@ -27,17 +27,6 @@ const Home = () => {
   const [email, setEmail] = useState("");
   const [subscriptionStatus, setSubscriptionStatus] = useState(null);
 
-  const categories = [
-    "finance",
-    "fraud",
-    "new",
-    "trading",
-    "business",
-    "investing",
-    "wealth",
-    "economy",
-  ];
-
   const fetchLatestBlogs = useCallback(({ page = 1 }) => {
     setBlogs((currentBlogs) => {
       axios
@@ -172,7 +161,7 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <div className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
+      <div className="relative bg-gradient-to-br from-[#9b30ff] via-[#8a2be2] to-[#4b0082] text-white">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="relative z-10 max-w-4xl mx-auto px-4 py-20 text-center">
           <h1 className="text-5xl md:text-6xl font-light tracking-wide mb-6">
@@ -199,19 +188,6 @@ const Home = () => {
             >
               All Posts
             </button>
-            {categories.map((category) => (
-              <button
-                key={category}
-                className={`px-4 py-2 text-sm font-medium transition-all duration-200 whitespace-nowrap capitalize ${
-                  pageState === category
-                    ? "text-gray-900 border-b-2 border-gray-900"
-                    : "text-gray-600 hover:text-gray-900"
-                }`}
-                onClick={handleLoadCategory}
-              >
-                {category}
-              </button>
-            ))}
           </div>
         </div>
       </div>
@@ -300,17 +276,6 @@ const Home = () => {
                               {blog?.activity?.total_comments || 0}
                             </span>
                           </div>
-
-                          <div className="flex flex-wrap gap-2">
-                            {blog?.tags?.slice(0, 2).map((tag, i) => (
-                              <span
-                                key={i}
-                                className="px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded-full"
-                              >
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
                         </div>
                       </div>
                     </article>
@@ -397,22 +362,6 @@ const Home = () => {
               </div>
 
               {/* Tags Cloud */}
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h3 className="text-lg font-light text-gray-900 mb-4 pb-2 border-b border-gray-100">
-                  Popular Tags
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {categories.map((tag) => (
-                    <button
-                      key={tag}
-                      className="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs rounded-full transition-colors duration-200 capitalize"
-                      onClick={() => setPageState(tag)}
-                    >
-                      {tag}
-                    </button>
-                  ))}
-                </div>
-              </div>
             </div>
           </aside>
         </div>

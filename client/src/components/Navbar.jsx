@@ -71,10 +71,10 @@ const Navbar = () => {
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-8 ml-8">
           <Link
-            to="/blog-main"
+            to="/about"
             className="text-dark-grey hover:text-black dark:hover:text-white transition-colors"
           >
-            Нийтлэл мэдээлэл
+            Бидний тухай
           </Link>
           <Link
             to="/products"
@@ -82,17 +82,18 @@ const Navbar = () => {
           >
             Бүтээгдэхүүн үйлчилгээ
           </Link>
-                    <Link
+          <Link
+            to="/blog-main"
+            className="text-dark-grey hover:text-black dark:hover:text-white transition-colors"
+          >
+            Нийтлэл мэдээлэл
+          </Link>
+
+          <Link
             to="/podcast"
             className="text-dark-grey hover:text-black dark:hover:text-white transition-colors"
           >
             Podcast
-          </Link>
-          <Link
-            to="/about"
-            className="text-dark-grey hover:text-black dark:hover:text-white transition-colors"
-          >
-            Бидний тухай
           </Link>
         </div>
 
@@ -163,11 +164,11 @@ const Navbar = () => {
           <div className="absolute top-full left-0 w-full bg-white dark:bg-black border-b border-grey md:hidden z-50 shadow-lg">
             <div className="px-6 py-4 space-y-2">
               <Link
-                to="/blog-main"
-                className="block text-dark-grey hover:text-black dark:hover:text-white transition-colors py-3 border-b border-grey/20"
+                to="/about"
+                className="block text-dark-grey hover:text-black dark:hover:text-white transition-colors py-3"
                 onClick={closeMobileMenu}
               >
-                Нийтлэл мэдээлэл
+                Бидний тухай
               </Link>
               <Link
                 to="/products"
@@ -177,17 +178,18 @@ const Navbar = () => {
                 Бүтээгдэхүүн үйлчилгээ
               </Link>
               <Link
+                to="/blog-main"
+                className="block text-dark-grey hover:text-black dark:hover:text-white transition-colors py-3 border-b border-grey/20"
+                onClick={closeMobileMenu}
+              >
+                Нийтлэл мэдээлэл
+              </Link>
+
+              <Link
                 to="/podcast"
                 className="text-dark-grey hover:text-black dark:hover:text-white transition-colors"
               >
                 Podcast
-              </Link>
-              <Link
-                to="/about"
-                className="block text-dark-grey hover:text-black dark:hover:text-white transition-colors py-3"
-                onClick={closeMobileMenu}
-              >
-                Бидний тухай
               </Link>
 
               {/* Mobile User Navigation */}
