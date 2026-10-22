@@ -1,37 +1,27 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import AnimationWrapper from "../components/common/AnimationWrapper.jsx";
 import Loader from "../components/common/Loader.jsx";
+import NodataMessage from "../components/common/NodataMessage.jsx";
+import BlogCard from "../components/common/cards/BlogCard.jsx";
 import { filterPaginationData } from "../functions/paginationData.js";
-
-const NodataMessage = ({ message }) => (
-  <div className="text-center py-12">
-    <div className="text-gray-400 text-lg">{message}</div>
-  </div>
-);
+import { getFullDay } from "../utils/getDate.js";
+import { BLOG_CATEGORIES } from "../utils/categories.js";
 
 const BlogMain = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const pageState = searchParams.get("tag") || "home";
+  const setPageState = (category) =>
+    setSearchParams(category === "home" ? {} : { tag: category });
+
   const [blogs, setBlogs] = useState(null);
   const [trendingBlogs, setTrendingBlogs] = useState(null);
-  const [pageState, setPageState] = useState("home");
   const [error, setError] = useState(null);
   const [email, setEmail] = useState("");
   const [subscriptionStatus, setSubscriptionStatus] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const observer = useRef();
-
-  const categories = [
-    "finance",
-    "fraud",
-    "new",
-    "trading",
-    "business",
-    "investing",
-    "wealth",
-    "economy",
-  ];
 
   const fetchLatestBlogs = useCallback(({ page = 1 }) => {
     setBlogs((currentBlogs) => {
@@ -175,248 +165,147 @@ const BlogMain = () => {
 
     return () => observer.current?.disconnect();
   }, [blogs, pageState, fetchLatestBlogs, fetchBlogsByCategory]);
-  const renderBlogCards = () => {
-    return blogs.results.map((blog) => (
-      <AnimationWrapper key={blog.blog_id} transition={{ delay: 0.1 }}>
-        <Link to={`/blog/${blog.blog_id}`}>
-          <article className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden group cursor-pointer">
-            <div className="relative overflow-hidden">
-              <img
-                src={
-                  blog.banner ||
-                  `https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&h=400&fit=crop`
-                }
-                alt={blog.title}
-                className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-              />
-              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300"></div>
-              <div className="absolute top-4 left-4">
-                <span className="px-3 py-1 bg-white/90 text-gray-800 text-xs font-medium rounded-full">
-                  {blog.tags?.[0] || "Article"}
-                </span>
-              </div>
-            </div>
-
-            <div className="p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="text-align-right">
-                  <p className="text-xs text-gray-500">
-                    {new Date(blog.publishedAt).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                  </p>
-                </div>
-              </div>
-
-              <h2 className="text-xl font-light text-gray-900 mb-3 leading-tight group-hover:text-gray-700 transition-colors duration-200">
-                {blog.title}
-              </h2>
-
-              <p className="text-gray-600 leading-relaxed mb-4 line-clamp-2">
-                {blog.des}
-              </p>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4 text-sm text-gray-500">
-                  <span className="flex items-center gap-1">
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                      />
-                    </svg>
-                    {blog.activity?.total_likes || 0}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                      />
-                    </svg>
-                    {blog.activity?.total_comments || 0}
-                  </span>
-                </div>
-
-                <span className="text-sm text-gray-400 group-hover:text-gray-600 transition-colors duration-200">
-                  Read more →
-                </span>
-              </div>
-            </div>
-          </article>
-        </Link>
-      </AnimationWrapper>
-    ));
+  const retry = () => {
+    setError(null);
+    setBlogs(null);
+    if (pageState === "home") {
+      fetchLatestBlogs({ page: 1 });
+    } else {
+      fetchBlogsByCategory({ page: 1 });
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <div className="relative bg-gradient-to-br from-[#9b30ff] via-[#8a2be2] to-[#4b0082] text-white">
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="relative z-10 max-w-4xl mx-auto px-4 py-16 text-center">
-          <h1 className="text-4xl md:text-5xl font-light tracking-wide mb-4">
-            Latest Articles
-          </h1>
-          <p className="text-lg md:text-xl font-light opacity-90 mb-8">
-            Discover insights on technology, business, and finance
-          </p>
+    <div className="min-h-screen">
+      {/* Page header */}
+      <div className="container-wide pt-12 md:pt-20">
+        <p className="kicker">Blog</p>
+        <h1 className="mt-2 text-4xl md:text-5xl font-black uppercase tracking-wide leading-none">
+          {pageState === "home" ? "Latest articles" : pageState}
+        </h1>
+        <p className="mt-4 text-xl text-muted max-w-xl">
+          Discover insights on technology, business, and finance
+        </p>
 
-          {/* Search Bar */}
-          <form onSubmit={handleSearch} className="max-w-md mx-auto">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search articles..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-4 py-3 pl-12 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/30 focus:bg-white/20"
-              />
-              <svg
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+        <div className="mt-8 flex gap-3 overflow-x-auto pb-4 -mx-1 px-1 [scrollbar-width:none]">
+          {["home", ...BLOG_CATEGORIES].map((category) => {
+            const active = pageState === category;
+            return (
+              <button
+                key={category}
+                onClick={() => setPageState(category)}
+                className={`chip capitalize transition-colors ${
+                  active ? "!bg-accent !text-white" : "hover:text-accent"
+                }`}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </div>
-          </form>
+                {category === "home" ? "All articles" : category}
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="container-wide py-10">
         <div className="flex flex-col lg:flex-row gap-12">
-          {/* Sidebar */}
-          <aside className="lg:w-80 shrink-0 order-2 lg:order-1">
-            <div className="sticky top-8 space-y-8">
-              {/* Categories */}
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-lg font-light text-gray-900 mb-4 pb-2 border-b border-gray-100">
-                  Categories
-                </h2>
-                <ul className="space-y-2">
-                  <li>
-                    <button
-                      className={`w-full text-left px-4 py-2 rounded-lg transition-all duration-200 text-sm ${
-                        pageState === "home"
-                          ? "bg-gray-900 text-white"
-                          : "text-gray-700 hover:bg-gray-100"
-                      }`}
-                      onClick={() => setPageState("home")}
-                    >
-                      All Articles
-                    </button>
-                  </li>
-                  {categories.map((category) => (
-                    <li key={category}>
-                      <button
-                        className={`w-full text-left px-4 py-2 rounded-lg transition-all duration-200 text-sm capitalize ${
-                          pageState === category
-                            ? "bg-gray-900 text-white"
-                            : "text-gray-700 hover:bg-gray-100"
-                        }`}
-                        onClick={() => setPageState(category)}
-                      >
-                        {category}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
+          {/* Main Content */}
+          <main className="flex-1 min-w-0">
+            {error ? (
+              <div className="rounded-bubble bg-white shadow-soft p-8 text-center">
+                <p className="text-red font-medium mb-3">{error}</p>
+                <button onClick={retry} className="chip hover:text-accent">
+                  Try again
+                </button>
               </div>
+            ) : blogs === null ? (
+              <Loader />
+            ) : blogs.results.length ? (
+              <div className="grid xl:grid-cols-2 gap-x-8 gap-y-10">
+                {blogs.results.map((blog, index) => (
+                  <AnimationWrapper
+                    key={blog.blog_id}
+                    transition={{ duration: 0.4, delay: (index % 5) * 0.06 }}
+                  >
+                    <BlogCard blog={blog} showDescription />
+                  </AnimationWrapper>
+                ))}
+                {isLoading && <Loader />}
+              </div>
+            ) : (
+              <NodataMessage message="No articles published yet" />
+            )}
 
-              {/* Trending Section */}
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-lg font-light text-gray-900 mb-4 pb-2 border-b border-gray-100">
-                  Trending Now
-                </h2>
+            <div id="load-more" className="h-10" />
+          </main>
+
+          {/* Sidebar */}
+          <aside className="lg:w-80 shrink-0">
+            <div className="sticky top-24 space-y-10">
+              {/* Trending */}
+              <div>
+                <p className="text-2xl md:text-[19px] font-bold mb-5">Trending now</p>
 
                 {trendingBlogs === null ? (
-                  <div className="flex justify-center py-4">
-                    <Loader />
-                  </div>
+                  <Loader />
                 ) : trendingBlogs?.length ? (
-                  <div className="space-y-4">
-                    {trendingBlogs.map((blog) => (
+                  <div className="space-y-5">
+                    {trendingBlogs.map((blog, index) => (
                       <Link
                         to={`/blog/${blog.blog_id}`}
                         key={blog.blog_id}
-                        className="group cursor-pointer"
+                        className="group flex gap-4 items-start"
                       >
-                        <div className="flex gap-3">
+                        <span className="text-3xl font-black leading-none text-line w-12 shrink-0">
+                          {String(index + 1).padStart(2, "0")}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xl font-bold leading-snug line-clamp-2 group-hover:text-accent transition-colors">
+                            {blog.title}
+                          </p>
+                          <p className="mt-1 text-base text-muted">
+                            {blog.author?.personal_info?.fullName}
+                            <span className="pre-dot">{getFullDay(blog.publishedAt)}</span>
+                          </p>
+                        </div>
+                        {blog.banner && (
                           <img
                             src={blog.banner}
                             alt={blog.title}
-                            className="w-16 h-16 rounded-lg object-cover"
+                            className="!w-14 !h-14 rounded-full shrink-0"
                           />
-                          <div className="flex-1">
-                            <h4 className="text-sm font-medium text-gray-900 group-hover:text-gray-600 transition-colors duration-200 line-clamp-2 mb-1">
-                              {blog.title}
-                            </h4>
-                            <div className="flex items-center gap-2 text-xs text-gray-500">
-                              <span>{blog.author.personal_info.fullName}</span>
-                              <span>•</span>
-                              <span>
-                                {new Date(
-                                  blog.publishedAt
-                                ).toLocaleDateString()}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
+                        )}
                       </Link>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-gray-500 text-center py-4">
-                    No trending articles
-                  </p>
+                  <p className="text-base text-muted">No trending articles</p>
                 )}
               </div>
 
               {/* Newsletter Signup */}
-              <div className="relative bg-gradient-to-br from-[#9b30ff] via-[#8a2be2] to-[#4b0082] text-white rounded-lg p-6">
-                <h3 className="text-lg font-light mb-2">Stay Updated</h3>
-                <p className="text-sm text-gray-300 mb-4">
+              <div className="rounded-bubble bg-ink text-white p-7">
+                <p className="kicker">Newsletter</p>
+                <p className="mt-2 text-2xl font-black uppercase tracking-wide">
+                  Stay updated
+                </p>
+                <p className="mt-2 text-base text-white/60 mb-5">
                   Get the latest articles delivered to your inbox
                 </p>
                 <form
                   onSubmit={handleNewsletterSubscription}
-                  className="flex flex-col gap-2"
+                  className="flex flex-col gap-3"
                 >
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Your email address"
-                    className="px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/30"
+                    className="rounded-full bg-white/10 border border-white/20 px-5 py-3 text-white placeholder:text-white/40 outline-none focus:border-accent"
                     disabled={subscriptionStatus?.type === "loading"}
                   />
                   <button
                     type="submit"
                     disabled={subscriptionStatus?.type === "loading"}
-                    className="px-4 py-2 bg-white text-gray-900 rounded-lg hover:bg-gray-100 transition-colors duration-200 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="btn-accent"
                   >
                     {subscriptionStatus?.type === "loading"
                       ? "Subscribing..."
@@ -424,86 +313,20 @@ const BlogMain = () => {
                   </button>
                 </form>
 
-                {/* Status Message */}
-                {subscriptionStatus && (
-                  <div
-                    className={`mt-3 text-sm ${
+                {subscriptionStatus && subscriptionStatus.type !== "loading" && (
+                  <p
+                    className={`mt-3 text-base ${
                       subscriptionStatus.type === "success"
-                        ? "text-green-300"
-                        : subscriptionStatus.type === "error"
-                        ? "text-red-300"
-                        : "text-gray-300"
+                        ? "text-accent"
+                        : "text-red"
                     }`}
                   >
                     {subscriptionStatus.message}
-                  </div>
+                  </p>
                 )}
               </div>
             </div>
           </aside>
-
-          {/* Main Content */}
-          <main className="flex-1 order-1 lg:order-2">
-            {error ? (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-                <div className="text-red-600 mb-2">
-                  <svg
-                    className="w-8 h-8 mx-auto mb-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  {error}
-                </div>
-                <button
-                  onClick={() => {
-                    setError(null);
-                    setBlogs(null);
-                    if (searchQuery.trim()) {
-                      searchBlogs(searchQuery.trim(), 1);
-                    } else {
-                      fetchLatestBlogs({ page: 1 });
-                    }
-                  }}
-                  className="text-sm text-red-600 hover:text-red-800 underline"
-                >
-                  Try again
-                </button>
-              </div>
-            ) : blogs === null ? (
-              <div className="flex justify-center py-12">
-                <Loader />
-              </div>
-            ) : blogs.results.length ? (
-              <div className="grid gap-8">
-                {renderBlogCards()}
-                {isLoading && (
-                  <div className="flex justify-center py-8">
-                    <Loader />
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <NodataMessage
-                  message={
-                    searchQuery.trim()
-                      ? `No articles found for "${searchQuery}"`
-                      : "No articles published yet"
-                  }
-                />
-              </div>
-            )}
-
-            <div id="load-more" className="h-10" />
-          </main>
         </div>
       </div>
     </div>

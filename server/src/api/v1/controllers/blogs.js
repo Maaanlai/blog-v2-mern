@@ -267,7 +267,7 @@ export const trendingBlogs = async (req, res) => {
 			"activity.total_likes": -1,
 			publishedAt: -1,
 		})
-		.select("blog_id title publishedAt -_id banner")
+		.select("blog_id title publishedAt -_id banner tags activity")
 		.limit(5)
 		.then((blogs) => {
 			return res.status(200).json({
@@ -283,6 +283,41 @@ export const trendingBlogs = async (req, res) => {
 		})
 }
 
+
+export const blogsInRange = async (req, res) => {
+	const { from, to, limit = 14 } = req.body
+
+	const start = new Date(from)
+	const end = new Date(to)
+
+	if (isNaN(start) || isNaN(end)) {
+		return res.status(400).json({
+			status: 6001,
+			message: "from and to must be valid dates",
+		})
+	}
+
+	Blog.find({ draft: false, publishedAt: { $gte: start, $lt: end } })
+		.populate(
+			"author",
+			"personal_info.profile_img personal_info.username personal_info.fullName -_id"
+		)
+		.sort({ publishedAt: -1 })
+		.select("blog_id title des banner activity tags publishedAt -_id")
+		.limit(Math.min(Number(limit) || 14, 50))
+		.then((blogs) => {
+			return res.status(200).json({
+				status: 6000,
+				blogs,
+			})
+		})
+		.catch((error) => {
+			return res.status(500).json({
+				status: 6001,
+				message: error?.message,
+			})
+		})
+}
 
 export const getPodcastBlogs = async (req, res) => {
 	const { page = 1 } = req.body

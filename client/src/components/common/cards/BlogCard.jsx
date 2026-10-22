@@ -1,74 +1,105 @@
 import { Link } from "react-router-dom";
-import { getDate } from "../../../utils/getDate";
+import { getFullDay } from "../../../utils/getDate";
+import { user as defaultAvatar } from "../../../assets";
 
-const BlogCard = ({ blog }) => {
+/**
+ * Speech-bubble style article card (inspired by unread.today):
+ * author row on top, then a white card whose square corner points at the
+ * author, with a category label, bold title and a circular cover on the right.
+ *
+ * align="right" mirrors the author row and the bubble, for zig-zag lists.
+ */
+const BlogCard = ({
+  blog,
+  align = "left",
+  showDescription = false,
+  showStats = true,
+}) => {
   const {
     title,
     des,
     banner,
-    tags,
+    tags = [],
     publishedAt,
-    activity: { total_likes },
+    activity: { total_likes = 0, total_comments = 0 } = {},
     blog_id: id,
     author,
   } = blog;
 
   const { fullName, username, profile_img } = author?.personal_info || {};
+  const right = align === "right";
 
   return (
-    <Link
-      to={`/blog/${id}`}
-      className="block bg-white rounded-xl shadow-sm hover:shadow-lg tWransition-shadow duration-300 overflow-hidden"
-    >
-      {/* Banner Image */}
-      <div className="relative h-48 w-full overflow-hidden">
+    <div className="group">
+      <div
+        className={`flex items-center gap-3 mb-4 px-1 ${
+          right ? "flex-row-reverse text-right" : ""
+        }`}
+      >
         <img
-          src={banner}
-          alt={title}
-          className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300"
+          src={profile_img || defaultAvatar}
+          alt={fullName || username || "author"}
+          className="!w-9 !h-9 rounded-full border border-line shrink-0"
         />
-        {/* Tag Overlay */}
-        <span className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-gray-800 px-3 py-1 rounded-full text-sm font-medium">
-          {tags[0]}
-        </span>
-      </div>
-
-      <div className="p-6">
-        {/* Title */}
-        <h2 className="text-xl font-bold text-gray-900 line-clamp-2 hover:text-blue-600 transition-colors">
-          {title}
-        </h2>
-
-        {/* Description */}
-        <p className="mt-3 text-gray-600 line-clamp-2 text-base">{des}</p>
-
-        {/* Author Info & Metadata */}
-        <div className="mt-6 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div>
-              <p className="text-sm font-medium text-gray-900">
-                {fullName || "Anonymous"}{" "}
-                {/* Fallback to "Anonymous" if fullName is missing */}
-              </p>
-              <p className="text-sm text-gray-500">
-                @{username || "no-username"}{" "}
-                {/* Fallback to "no-username" if username is missing */}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-4 text-sm text-gray-500">
-            <div className="flex items-center">
-              <i className="fi fi-rr-heart text-red-500 mr-1"></i>
-              <span>{total_likes}</span>
-            </div>
-            <div className="hidden md:block">
-              <time dateTime={publishedAt}>{getDate(publishedAt)}</time>
-            </div>
-          </div>
+        <div className="leading-snug min-w-0">
+          <p className="text-base font-medium text-black line-clamp-1">
+            {fullName || username || "Anonymous"}
+          </p>
+          <p className="text-base text-muted">{getFullDay(publishedAt)}</p>
         </div>
       </div>
-    </Link>
+
+      <Link
+        to={`/blog/${id}`}
+        className={`bubble-card md:min-h-[180px] ${
+          right ? "!rounded-[2.7rem_0_2.7rem_2.7rem]" : ""
+        }`}
+      >
+        <div className="flex items-start gap-5 md:gap-8">
+          <div className="flex-1 min-w-0 pt-1">
+            {tags[0] && (
+              <p className="flex items-center gap-3 text-base font-semibold capitalize text-accent mb-2">
+                <span className="accent-dot" />
+                {tags[0]}
+              </p>
+            )}
+
+            <p className="md:pl-[18px] text-2xl md:text-[22px] font-bold leading-snug text-ink line-clamp-3 group-hover:text-accent transition-colors">
+              {title}
+            </p>
+
+            {showDescription && des && (
+              <p className="md:pl-[18px] mt-2 text-base text-dark-grey line-clamp-2">
+                {des}
+              </p>
+            )}
+
+            {showStats && (
+              <div className="md:pl-[18px] mt-4 flex items-center gap-4 text-base font-semibold text-muted">
+                <span className="flex items-center gap-1">
+                  <i className="fi fi-rr-heart"></i>
+                  {total_likes}
+                </span>
+                <span className="flex items-center gap-1">
+                  <i className="fi fi-rr-comment-dots"></i>
+                  {total_comments}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {banner && (
+            <div className="w-[88px] h-[88px] md:w-[135px] md:h-[135px] shrink-0 rounded-full overflow-hidden bg-grey">
+              <img
+                src={banner}
+                alt={title}
+                className="transition-transform duration-300 group-hover:scale-110"
+              />
+            </div>
+          )}
+        </div>
+      </Link>
+    </div>
   );
 };
 

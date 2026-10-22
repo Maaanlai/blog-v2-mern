@@ -94,14 +94,14 @@ const BlogInteraction = () => {
 	}
 	return (
 		<>
-			<hr className="border-grey my-2" />
+			<hr className="border-line my-3" />
 
 			<div className="flex gap-6 justify-between">
 				<div className="flex gap-3 items-center">
 					<button
 						className={
 							"w-10 h-10 rounded-full flex items-center justify-center " +
-							(isUserLiked ? "bg-red/20 text-red" : "bg-grey/80")
+							(isUserLiked ? "bg-red/20 text-red" : "bg-white shadow-soft hover:text-accent")
 						}
 						onClick={handleLike}
 					>
@@ -112,17 +112,17 @@ const BlogInteraction = () => {
 							}
 						></i>
 					</button>
-					<p className="text-xl text-dark-grey">{total_likes}</p>
+					<p className="text-xl font-semibold text-muted">{total_likes}</p>
 
 					<button
-						className="w-10 h-10 rounded-full flex items-center justify-center bg-grey/80"
+						className="w-10 h-10 rounded-full flex items-center justify-center bg-white shadow-soft hover:text-accent"
 						onClick={() =>
 							setIsCommentsWrapper((prevVal) => !prevVal)
 						}
 					>
 						<i className="fi fi-rr-comment-dots"></i>
 					</button>
-					<p className="text-xl text-dark-grey">{total_comments}</p>
+					<p className="text-xl font-semibold text-muted">{total_comments}</p>
 				</div>
 
 				<div className="flex gap-6 items-center">
@@ -138,7 +138,7 @@ const BlogInteraction = () => {
 					{username === username_ ? (
 						<Link
 							to={`/editor/${blog_id}`}
-							className="underline hover:text-purple"
+							className="underline hover:text-accent"
 						>
 							Edit
 						</Link>
@@ -154,7 +154,7 @@ const BlogInteraction = () => {
 				</div>
 			</div>
 
-			<hr className="border-grey my-2" />
+			<hr className="border-line my-3" />
 		</>
 	)
 }

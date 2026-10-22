@@ -1,7 +1,7 @@
 const Img = ({ src, caption }) => {
   return (
     <div>
-      <img src={src} />
+      <img src={src} className="rounded-[1rem]" />
       {caption.length ? (
         <p className="w-full text-center my-3 md:mb-12 text-base text-dark-grey">
           {caption}
@@ -15,10 +15,10 @@ const Img = ({ src, caption }) => {
 
 const Quote = ({ quote, caption }) => {
   return (
-    <div className="bg-purple/10 p-3 pl-5 border-l-4 border-purple">
-      <p className="text-xl leading-10 md:text-2xl">{quote}</p>
+    <div className="my-8 pl-6 border-l-4 border-accent">
+      <p className="!text-2xl md:!text-3xl !font-bold !leading-snug">{quote}</p>
       {caption.length ? (
-        <p className="w-full text-purple text-base">{caption}</p>
+        <p className="w-full mt-3 !text-muted !text-base !font-semibold">{caption}</p>
       ) : (
         ""
       )}

@@ -7,6 +7,8 @@ import PageNotFoundImageDark from "./404-dark.png"
 import PageNotFoundImageLight from "./404-light.png"
 import user from "./user.png"
 import logo from "./logo.png"
+import ubLogo from "./ub-logo.png"
+import ubLogoWhite from "./ub-logo-white.png"
 
 export {
 	logoDark,
@@ -17,5 +19,7 @@ export {
 	PageNotFoundImageDark,
 	PageNotFoundImageLight,
 	user,
-	logo
+	logo,
+	ubLogo,
+	ubLogoWhite,
 }

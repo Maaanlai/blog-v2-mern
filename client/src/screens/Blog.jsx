@@ -3,7 +3,7 @@ import axios from "axios"
 import { Link, useParams } from "react-router-dom"
 
 // utils
-import { getDate } from "../utils/getDate"
+import { getFullDay } from "../utils/getDate"
 
 // components
 import AnimationWrapper from "../components/common/AnimationWrapper"
@@ -26,6 +26,23 @@ export const blogStructure = {
 }
 
 export const BlogContext = createContext({})
+
+const collectText = (value) =>
+    typeof value === "string"
+        ? value
+        : value && typeof value === "object"
+        ? Object.values(value).map(collectText).join(" ")
+        : ""
+
+// rough estimate at ~200 words per minute
+const readingTime = (content) => {
+    const text = (content?.[0]?.blocks || [])
+        .map((block) => collectText(block.data))
+        .join(" ")
+        .replace(/<[^>]+>/g, " ")
+    const words = text.split(/\s+/).filter(Boolean).length
+    return Math.max(1, Math.round(words / 200))
+}
 
 const Blog = () => {
     const [blog, setBlog] = useState(blogStructure)
@@ -130,90 +147,88 @@ const Blog = () => {
 
                     <ReportContainer />
 
-                    <div className="max-w-[900px] center py-10 max-lg:px-[5vw]">
-                    <div className="bg-cover bg-center text-center overflow-hidden h-96">
-        <img src={banner} alt={title} className="w-full h-full object-cover" />
-      </div>
-      
-      {/* Content Section */}
-      <div className="w-3xl">
-        <div className="mt-3 bg-white rounded-b lg:rounded-b-none lg:rounded-r flex flex-col justify-between leading-normal">
-          <div className="bg-white relative -mt-32 p-5 sm:p-10">
-            {/* Title */}
-            <h1 className="text-gray-900 font-bold text-3xl mb-2">
-              {title}
-            </h1>
-            
-            {/* Author Info */}
-            <div className="flex items-center gap-4 mt-4">
-              <img 
-                src={profile_img} 
-                alt={username_} 
-                className="w-12 h-12 rounded-full"
-              />
-              <div className="flex flex-col">
-                <span className="text-gray-900 font-medium">
-                  {fullName}
-                </span>
-                <Link 
-                  to={`/user/${username_}`}
-                  className="text-indigo-600 hover:text-gray-900 transition duration-500 ease-in-out"
-                >
-                  @{username_}
-                </Link>
-              </div>
-              <span className="text-gray-500 ml-auto">
-                Published on {getDate(publishedAt)}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-                        {/* <BlogInteraction /> */}
+                    <article className="pb-10">
+                        {/* Header */}
+                        <header className="max-w-[860px] center px-[5vw] md:px-0 pt-12 md:pt-20 text-center">
+                            {tags?.[0] && (
+                                <Link
+                                    to={`/blog-main?tag=${tags[0]}`}
+                                    className="kicker hover:opacity-70"
+                                >
+                                    {tags[0]}
+                                </Link>
+                            )}
 
-                        <div className="my-12 font-gelasio blog-page-content">
-                            {content[0].blocks.map((block, index) => (
-                                <div key={index} className="my-4 md:my-8">
-                                    <BlogContent block={block} />
+                            <h1 className="mt-4 text-4xl md:text-5xl font-bold leading-tight text-ink">
+                                {title}
+                            </h1>
+
+                            <div className="mt-8 flex flex-wrap items-center justify-center gap-3 text-base text-muted">
+                                <Link
+                                    to={`/user/${username_}`}
+                                    className="flex items-center gap-3 hover:opacity-70"
+                                >
+                                    <img
+                                        src={profile_img}
+                                        alt={username_}
+                                        className="!w-9 !h-9 rounded-full border border-line"
+                                    />
+                                    <span className="font-bold text-black">
+                                        {fullName || username_}
+                                    </span>
+                                </Link>
+                                <span>{getFullDay(publishedAt)}</span>
+                                <span className="pre-dot">
+                                    {readingTime(content)} min read
+                                </span>
+                            </div>
+                        </header>
+
+                        {/* Banner */}
+                        {banner && (
+                            <div className="container-wide mt-10 md:mt-14">
+                                <div className="aspect-[16/9] max-h-[640px] w-full overflow-hidden rounded-[1.4rem] md:rounded-[2rem] bg-grey shadow-float">
+                                    <img src={banner} alt={title} />
                                 </div>
-                            ))}
+                            </div>
+                        )}
+
+                        <div className="max-w-[720px] center px-[5vw] md:px-0">
+                            <div className="my-12 blog-page-content">
+                                {content[0].blocks.map((block, index) => (
+                                    <div key={index} className="my-4 md:my-6">
+                                        <BlogContent block={block} />
+                                    </div>
+                                ))}
+                            </div>
+
+                            <BlogInteraction />
                         </div>
 
-                        <BlogInteraction />
-
                         {similarBlogs !== null && similarBlogs.length ? (
-                            <>
-                                <h1 className="text-2xl mt-14 mb-10 font-medium">
-                                    Similar blogs
-                                </h1>
+                            <div className="container-wide">
+                                <div className="section-title mt-20">
+                                    <span>Similar stories</span>
+                                </div>
 
-                                {similarBlogs.map((blog, index) => {
-                                    const {
-                                        author: { personal_info },
-                                    } = blog
-
-                                    return (
+                                <div className="grid md:grid-cols-2 gap-x-10 gap-y-10">
+                                    {similarBlogs.map((blog, index) => (
                                         <AnimationWrapper
                                             key={index}
                                             transition={{
-                                                duration: 1,
+                                                duration: 0.6,
                                                 delay: index * 0.08,
                                             }}
                                         >
-                                            <BlogCard
-                                                blog={blog}
-                                                author={
-                                                    blog?.author?.personal_info
-                                                }
-                                            />
+                                            <BlogCard blog={blog} />
                                         </AnimationWrapper>
-                                    )
-                                })}
-                            </>
+                                    ))}
+                                </div>
+                            </div>
                         ) : (
                             ""
                         )}
-                    </div>
+                    </article>
                 </BlogContext.Provider>
             )}
         </AnimationWrapper>

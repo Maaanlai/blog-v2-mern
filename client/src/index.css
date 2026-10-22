@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Gelasio&family=Inter:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Gelasio&family=Inter:wght@400;500;600;700;800;900&display=swap');
 @import "@flaticon/flaticon-uicons/css/all/all";
 @import "./editor-theme.css";
 
@@ -8,7 +8,7 @@
 
 @layer components {
     * {
-        @apply m-0 p-0 box-border text-base outline-purple/30 duration-100;
+        @apply m-0 p-0 box-border text-base outline-accent/30 duration-100;
     }
 
     html {
@@ -16,7 +16,8 @@
     }
 
     body {
-        @apply font-inter font-normal text-black bg-white;
+        @apply font-inter font-normal text-black bg-paper antialiased;
+        letter-spacing: 0.01em;
     }
 
     i {
@@ -28,7 +29,7 @@
     }
 
     ::selection {
-        @apply bg-purple/30;
+        @apply bg-accent/20;
     }
 
     img {
@@ -36,7 +37,7 @@
     }
 
     .navbar {
-        @apply z-10 sticky top-0 flex items-center gap-12 w-full px-[5vw] py-5 h-[80px] border-b border-grey bg-white;
+        @apply z-10 sticky top-0 flex items-center gap-6 w-full px-[5vw] h-[80px] bg-paper/90 backdrop-blur-md;
     }
 
     .h-cover {
@@ -98,14 +99,17 @@
         @apply font-inter text-3xl leading-loose max-md:text-2xl max-md:leading-normal !important;
     }
 
-    #textEditor *,
-    .blog-page-content * {
+    #textEditor * {
         @apply font-gelasio text-xl leading-10 md:text-2xl;
+    }
+
+    .blog-page-content * {
+        @apply font-inter text-xl leading-9 md:text-[18px] md:leading-[1.85] text-black;
     }
 
     #textEditor a,
     .blog-page-content a {
-        @apply text-purple underline hover:opacity-50;
+        @apply text-accent underline underline-offset-4 hover:opacity-60;
     }
 
     .tag {
@@ -118,6 +122,56 @@
 
     .blog-index {
         @apply text-4xl sm:text-3xl lg:text-5xl font-bold text-grey leading-none;
+    }
+
+    /* ---- Unread-inspired building blocks ---- */
+
+    .container-wide {
+        @apply w-full max-w-[1525px] mx-auto px-[5vw] lg:px-[45px];
+    }
+
+    .section-title {
+        @apply flex items-center justify-between text-2xl md:text-[22px] font-bold text-black mt-12 mb-6;
+    }
+
+    .chip {
+        @apply inline-flex items-center gap-2 rounded-full bg-white px-5 py-2 text-base font-semibold text-black shadow-soft whitespace-nowrap;
+    }
+
+    .chip-accent {
+        @apply inline-block rounded-full bg-accent px-3 text-sm font-medium uppercase leading-[22px] text-white;
+    }
+
+    .accent-dot {
+        @apply inline-block w-1.5 h-1.5 rounded-full bg-accent align-middle;
+    }
+
+    .pre-dot::before {
+        content: "•";
+        @apply mx-2;
+    }
+
+    .kicker {
+        @apply text-sm font-bold uppercase tracking-[0.08em] text-accent;
+    }
+
+    .bubble-card {
+        @apply relative block rounded-bubble bg-white px-6 py-5 md:px-8 md:py-6 shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[4px_10px_60px_-4px_rgba(180,180,180,0.7)];
+    }
+
+    /* outlined capitals, like the category line in unread's hero */
+    .text-outline {
+        color: transparent;
+        -webkit-text-fill-color: transparent;
+        -webkit-text-stroke: 1px #fff;
+    }
+
+    .hover-lift {
+        @apply transition-transform duration-200 ease-in-out hover:scale-[1.04];
+    }
+
+    .btn-accent {
+        @apply inline-flex items-center justify-center rounded-full bg-accent px-8 py-3 text-xl font-semibold text-white shadow-soft hover:bg-[#6E0A8A] disabled:opacity-50;
     }
 }
 

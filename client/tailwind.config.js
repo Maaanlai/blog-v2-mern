@@ -15,8 +15,15 @@ export default {
 		},
 
 		extend: {
+			boxShadow: {
+				soft: "4px 4px 50px -4px rgba(209, 209, 209, 0.6)",
+				float: "0 35px 24px -10px rgba(209, 209, 209, 0.8)",
+			},
+			borderRadius: {
+				bubble: "0 2.7rem 2.7rem 2.7rem",
+			},
 			fontFamily: {
-				inter: ["'Inter'", "sans-serif"],
+				inter: ["'Inter'", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
 				gelasio: ["'Gelasio'", "serif"],
 			},
 		},
@@ -25,13 +32,19 @@ export default {
 		createThemes({
 			light: {
 				white: "#FFFFFF",
-				black: "#242424",
+				black: "#1C1C1C",
 				grey: "#F3F3F3",
 				"dark-grey": "#6B6B6B",
 				red: "#FF4E4E",
 				transparent: "transparent",
 				twitter: "#1DA1F2",
-				purple: "#8B46FF",
+				purple: "#890DAB",
+				paper: "#FAFAFA",
+				line: "#E6E6E6",
+				muted: "#888888",
+				accent: "#890DAB",
+				"accent-soft": "#C45BEB",
+				ink: "#000000",
 			},
 			dark: {
 				white: "#242424",
@@ -41,7 +54,13 @@ export default {
 				red: "#991F1F",
 				transparent: "transparent",
 				twitter: "#0E71A8",
-				purple: "#582c8E",
+				purple: "#6E0A8A",
+				paper: "#1A1A1A",
+				line: "#333333",
+				muted: "#9A9A9A",
+				accent: "#C45BEB",
+				"accent-soft": "#D98BF2",
+				ink: "#000000",
 			},
 		}),
 	],

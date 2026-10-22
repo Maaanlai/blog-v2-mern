@@ -9,6 +9,7 @@ import {
     createBlog,
     latestBlogs,
     trendingBlogs,
+    blogsInRange,
     searchBlogs,
     latestBlogsCount,
     searchBlogsCount,
@@ -37,6 +38,7 @@ router.post("/podcast", getPodcastBlogs)
 router.post("/podcast/total-posts", getPodcastBlogsCount)
 
 router.get("/trending", trendingBlogs)
+router.post("/range", blogsInRange)
 
 router.post("/get-blog", getBlog)
 
